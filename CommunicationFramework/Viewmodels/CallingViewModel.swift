@@ -30,23 +30,51 @@ public class CallingViewModel: NSObject, ObservableObject {
     @Published public var remoteVideoStreamModels: [RemoteVideoStreamModel] = []
     @Published public var incomingCallPushNotification: PushNotificationInfo?
     @Published public var isMicrophoneMuted: Bool = false
+    @Published public var isLocalVideoStreamEnabled: Bool = false
+    
+    private var communicationUserToken: CommunicationUserTokenModel? {
+        if CommunicationFrameworkHelper.credentialsExist {
+            return CommunicationUserTokenModel(token: CommunicationFrameworkHelper.token, expiresOn: nil, communicationUserId: CommunicationFrameworkHelper.id)
+        } else {
+            return nil
+        }
+    }
     
     public var hasCallAgent: Bool {
         self.callAgent != nil
     }
     
-    public var isLocalVideoStreamEnabled: Bool {
-        self.localVideoStreamModel != nil
+    private var hasLocalVideoStreams: Bool {
+        self.localVideoStreams != nil
     }
     
     private var hasIncomingCall: ((Bool) -> Void)?
     
     override private init() {
         super.init()
+        _ = PushRegistryDelegate.shared
     }
     
     public func setVoipToken(token: Data?) {
         self.voipToken = token
+    }
+    
+    public func initCallAgent() {
+        if !self.hasCallAgent {
+            if let communicationUserTokenModel = self.communicationUserToken {
+                self.initCallAgent(communicationUserTokenModel: communicationUserTokenModel, displayName: CommunicationFrameworkHelper.displayName) { success in
+                    if success {
+                        NotificationViewModel.shared.connectToHub()
+                    } else {
+                        print("callAgent not intialized.\n")
+                    }
+                }
+            } else {
+                print("no communication credentials found.")
+            }
+        } else {
+            NotificationViewModel.shared.connectToHub()
+        }
     }
     
     private func initCallAgent(communicationUserTokenModel: CommunicationUserTokenModel, displayName: String?, completion: @escaping (Bool) -> Void) {
@@ -159,7 +187,7 @@ public class CallingViewModel: NSObject, ObservableObject {
     }
     
     /// Starts a call
-    public func startCall() {
+    public func startCall(calleeIdentifier: String) {
         self.requestAudioPermission { success in
             if !success {
                 print("Audio permission denied.")
@@ -167,58 +195,46 @@ public class CallingViewModel: NSObject, ObservableObject {
             }
             
             if let callAgent = self.callAgent {
-                let callees: [CommunicationUserIdentifier] = [CommunicationUserIdentifier(self.callee)]
+                let callees: [CommunicationUserIdentifier] = [CommunicationUserIdentifier(calleeIdentifier)]
                 let startCallOptions = StartCallOptions()
 
                 self.getDeviceManager { _ in
                     if let localVideoStreams = self.localVideoStreams {
                         let videoOptions = VideoOptions(localVideoStreams: localVideoStreams)
                         startCallOptions.videoOptions = videoOptions
-
-                        callAgent.startCall(participants: callees, options: startCallOptions) { call, error in
-                            if error != nil {
-                                print("Failed to start call")
-                            } else {
-                                print("Successfully started call")
-                                self.call = call
-                                
-                                self.call?.delegate = self
-                                
-                                self.startVideo(call: self.call!, localVideoStream: localVideoStreams.first!)
-                                let callId = UUID(uuidString: (self.call?.id)!)
-                                CallController.shared.startCall(callId: callId!, handle: Constants.displayName, isVideo: true) { error in
-                                    if let error = error {
-                                        print("Outgoing call failed: \(error.localizedDescription)")
-                                    } else {
-                                        print("outgoing call started.")
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        callAgent.startCall(participants: callees, options: startCallOptions) { call, error in
-                            if error != nil {
-                                print("Failed to start call")
-                            } else {
-                                print("Successfully started call")
-                                self.call = call
-                                
-                                self.call?.delegate = self
-                                let callId = UUID(uuidString: (self.call?.id)!)
-                                CallController.shared.startCall(callId: callId!, handle: Constants.displayName, isVideo: true) { error in
-                                    if let error = error {
-                                        print("Outgoing call failed: \(error.localizedDescription)")
-                                    } else {
-                                        print("outgoing call started.")
-                                    }
-                                }
-                            }
-                        }
-                        print("outgoing call started.")
                     }
+                    callAgent.startCall(participants: callees, options: startCallOptions) { call, error in
+                        self.startCallCompletion(call: call, error: error, withVideo: self.hasLocalVideoStreams)
+                    }
+                    print("Outgoing call started.")
                 }
             } else {
                 print("callAgent not initialized.\n")
+            }
+        }
+    }
+    
+    /// Handle startCall completion for callAgent
+    private func startCallCompletion(call: Call?, error: Error?, withVideo: Bool) {
+        if error != nil {
+            print("Failed to start call")
+        } else {
+            print("Successfully started call")
+            self.call = call
+            
+            self.call?.delegate = self
+            
+            if withVideo {
+                self.startVideo(call: self.call!, localVideoStream: self.localVideoStreams!.first!)
+            }
+            
+            let callId = UUID(uuidString: (self.call?.id)!)
+            CallController.shared.startCall(callId: callId!, handle: CommunicationFrameworkHelper.displayName, isVideo: true) { error in
+                if let error = error {
+                    print("Outgoing call failed: \(error.localizedDescription)")
+                } else {
+                    print("outgoing call started.")
+                }
             }
         }
     }
@@ -229,6 +245,15 @@ public class CallingViewModel: NSObject, ObservableObject {
     
     /// Stops a call
     public func endCall() {
+        if let call = self.call, let callUUID = UUID(uuidString: call.id) {
+            CallController.shared.endCall(callId: callUUID) { error in
+                if let error = error {
+                    print("EndCall request failed: \(error.localizedDescription)\n")
+                } else {
+                    print("EndCall request succeeded.\n")
+                }
+            }
+        }
     }
     
     /// Toggle mute in a session
@@ -254,14 +279,53 @@ public class CallingViewModel: NSObject, ObservableObject {
     
     /// Toggle video in a session
     public func toggleVideo() {
+        if let call = self.call, let localVideoStreams = self.localVideoStreams {
+            if self.isLocalVideoStreamEnabled {
+                stopVideo()
+            } else {
+                startVideo(call: call, localVideoStream: localVideoStreams.first!)
+            }
+        }
     }
     
     /// Stops the video in a session
     private func stopVideo() {
+        if let call = self.call, let localVideoStreams = self.localVideoStreams {
+            call.stopVideo(stream: localVideoStreams.first!) { error in
+                if let error = error {
+                    print("LocalVideo failed to stop: \(error.localizedDescription)\n")
+                } else {
+                    print("LocalVideo stopped successfully.\n")
+                    if let localVideoStreamModel = self.localVideoStreamModel {
+                        self.isLocalVideoStreamEnabled = false
+                        localVideoStreamModel.renderer?.dispose()
+                        localVideoStreamModel.renderer = nil
+                        localVideoStreamModel.videoStreamView = nil
+                    }
+                }
+            }
+        }
     }
     
     /// Starts the video in a session
-    private func startVideo() {
+    func startVideo(call: Call, localVideoStream: LocalVideoStream) -> Void {
+        requestVideoPermission { success in
+            if success {
+                if let localVideoStreamModel = self.localVideoStreamModel {
+                    call.startVideo(stream: localVideoStream) { error in
+                        if error != nil {
+                            print("LocalVideo failed to start.\n")
+                        } else {
+                            print("LocalVideo started successfully.\n")
+                            localVideoStreamModel.createView(localVideoStream: localVideoStream)
+                            self.isLocalVideoStreamEnabled = true
+                        }
+                    }
+                }
+            } else {
+                print("Permission denied.\n")
+            }
+        }
     }
     
     // - MARK: Callback methods for CallKit
@@ -278,10 +342,11 @@ public class CallingViewModel: NSObject, ObservableObject {
                         if let localVideoStreams = self.localVideoStreams {
                             let videoOptions = VideoOptions(localVideoStreams: localVideoStreams)
                             acceptCallOptions.videoOptions = videoOptions
-                            call.accept(options: acceptCallOptions) { (call, error) in
+                            call.accept(options: acceptCallOptions) { call, error in
                                 if error == nil {
                                     print("Incoming call accepted")
                                     self.localVideoStreamModel?.createView(localVideoStream: localVideoStreams.first!)
+                                    self.isLocalVideoStreamEnabled = true
                                 } else {
                                     print("Failed to accept incoming call")
                                 }
@@ -443,6 +508,8 @@ extension CallingViewModel: CallAgentDelegate {
 
         if let addedCall = args.addedCalls.first {
             print("addedCalls: \(args.addedCalls.count)")
+            self.call = addedCall
+            self.call?.delegate = self
             self.callState = addedCall.state
             self.isMicrophoneMuted = addedCall.isMuted
             self.hasIncomingCall?(true)
@@ -471,7 +538,93 @@ extension CallingViewModel: IncomingCallDelegate {
     
     // Event raised when incoming call was not answered
     public func incomingCall(_ incomingCall: IncomingCall, didEnd args: PropertyChangedEventArgs) {
-        print("Incoming call was not answered")
+        print("Incoming call was not answered.")
         self.incomingCall = nil
+    }
+}
+
+// MARK: - CallDelegate
+extension CallingViewModel: CallDelegate {
+    
+    // TODO: Wird nur bei Outcoing calls aufgerufen...
+    public func call(_ call: Call, didChangeState args: PropertyChangedEventArgs) {
+        print("\n----------------------------------")
+        print("onCallStateChanged: \(String(reflecting: call.state.name))")
+        print("----------------------------------\n")
+        self.callState = call.state
+        
+        if call.state == .connected {
+            if let callUUID = UUID(uuidString: call.id) {
+                ProviderDelegate.shared.startedConnectingAt(callId: callUUID)
+                ProviderDelegate.shared.connectedAt(callId: callUUID)
+                // TODO: Display name von caller wird nicht übergeben
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.remoteVideoStreamModels.append(RemoteVideoStreamModel(identifier: call.id, displayName: call.callerInfo.displayName, remoteParticipant: call.remoteParticipants[0]))
+                }
+            }
+        }
+        
+        if call.state == .disconnected || call.state == .none {
+            self.stopVideo()
+            self.endCall()
+            self.remoteVideoStreamModels.forEach({ (remoteVideoStreamModel) in
+                remoteVideoStreamModel.renderer?.dispose()
+                remoteVideoStreamModel.videoStreamView = nil
+                remoteVideoStreamModel.remoteParticipant?.delegate = nil
+            })
+            self.remoteVideoStreamModels = []
+        }
+    }
+    
+    public func call(_ call: Call, didUpdateLocalVideoStreams args: LocalVideoStreamsUpdatedEventArgs) {
+        print("\n--------------------------")
+        print("onLocalVideoStreamsChanged")
+        print("--------------------------\n")
+
+        print("addedStreams: \(args.addedStreams.count)")
+        print("removedStreams: \(args.removedStreams.count)")
+    }
+    
+    // TODO: Wird benötigt?
+    public func call(_ call: Call, didUpdateRemoteParticipant args: ParticipantsUpdatedEventArgs) {
+        print("\n---------------------------")
+        print("onRemoteParticipantsUpdated")
+        print("---------------------------\n")
+        
+        if args.addedParticipants.count > 0 {
+            print("addedParticipants: \(String(describing: args.addedParticipants.count))")
+            
+            args.addedParticipants.forEach { (remoteParticipant) in
+                if remoteParticipant.identifier is CommunicationUserIdentifier {
+                    let communicationUserIdentifier = remoteParticipant.identifier as! CommunicationUserIdentifier
+                    print("addedParticipant identifier:  \(String(describing: communicationUserIdentifier))")
+                    print("addedParticipant displayName \(String(describing: remoteParticipant.displayName))")
+                    print("addedParticipant streams \(String(describing: remoteParticipant.videoStreams.count))")
+                    
+                    let remoteVideoStreamModel = RemoteVideoStreamModel(identifier: communicationUserIdentifier.identifier, displayName: remoteParticipant.displayName, remoteParticipant: remoteParticipant)
+                    remoteVideoStreamModels.append(remoteVideoStreamModel)
+                }
+            }
+        }
+        
+        if args.removedParticipants.count > 0 {
+            print("removedParticipants: \(String(describing: args.removedParticipants.count))")
+            
+            args.removedParticipants.forEach { (remoteParticipant) in
+                if remoteParticipant.identifier is CommunicationUserIdentifier {
+                    let communicationUserIdentifier = remoteParticipant.identifier as! CommunicationUserIdentifier
+                    print("removedParticipant identifier:  \(String(describing: communicationUserIdentifier))")
+                    print("removedParticipant displayName \(String(describing: remoteParticipant.displayName))")
+                    
+                    if let removedIndex = remoteVideoStreamModels.firstIndex(where: {$0.identifier == communicationUserIdentifier.identifier}) {
+                        let remoteVideoStreamModel = remoteVideoStreamModels[removedIndex]
+                        remoteVideoStreamModel.remoteParticipant?.delegate = nil
+                        remoteVideoStreamModel.renderer?.dispose()
+                        remoteVideoStreamModel.videoStreamView = nil
+                        remoteVideoStreamModels.remove(at: removedIndex)
+                    }
+                }
+            }
+        }
     }
 }

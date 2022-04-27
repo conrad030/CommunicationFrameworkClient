@@ -9,9 +9,13 @@
 /* Begin PBXBuildFile section */
 		657B649260C5079670393B3F /* Pods_CommunicationFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1132CF220F1A602D76135BF4 /* Pods_CommunicationFramework.framework */; };
 		657EF83A7DACAC2A2AD75516 /* Pods_CommunicationFrameworkTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C9151C8DB82E0482095629E /* Pods_CommunicationFrameworkTests.framework */; };
+		7A6668A42816A4AD003E16A6 /* ServerSettings.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7A6668A32816A4AD003E16A6 /* ServerSettings.plist */; };
+		7A6668A62816A51D003E16A6 /* PLHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6668A52816A51D003E16A6 /* PLHelper.swift */; };
+		7A6668A82816B184003E16A6 /* NotificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6668A72816B184003E16A6 /* NotificationViewModel.swift */; };
 		7ACCEFCF2812B20E0076746C /* CallController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFCE2812B20E0076746C /* CallController.swift */; };
 		7ACCEFD12812B2FF0076746C /* StreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFD02812B2FF0076746C /* StreamView.swift */; };
 		7ACCEFD32812B6200076746C /* PushRegistryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFD22812B6200076746C /* PushRegistryDelegate.swift */; };
+		7ACCEFD62812D98A0076746C /* CallState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFD52812D98A0076746C /* CallState.swift */; };
 		7AE015AC2811AF64004A195B /* CommunicationFrameworkApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE015AB2811AF64004A195B /* CommunicationFrameworkApp.swift */; };
 		7AE015AE2811AF64004A195B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AE015AD2811AF64004A195B /* ContentView.swift */; };
 		7AE015B02811AF68004A195B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AE015AF2811AF68004A195B /* Assets.xcassets */; };
@@ -56,9 +60,13 @@
 		3C9151C8DB82E0482095629E /* Pods_CommunicationFrameworkTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CommunicationFrameworkTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6947F67916CC0DFE4953AFC7 /* Pods-CommunicationFramework.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CommunicationFramework.debug.xcconfig"; path = "Target Support Files/Pods-CommunicationFramework/Pods-CommunicationFramework.debug.xcconfig"; sourceTree = "<group>"; };
 		6C5B5D8C2E4FA92AFA8ABDD9 /* Pods-CommunicationFrameworkTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CommunicationFrameworkTests.debug.xcconfig"; path = "Target Support Files/Pods-CommunicationFrameworkTests/Pods-CommunicationFrameworkTests.debug.xcconfig"; sourceTree = "<group>"; };
+		7A6668A32816A4AD003E16A6 /* ServerSettings.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ServerSettings.plist; sourceTree = "<group>"; };
+		7A6668A52816A51D003E16A6 /* PLHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLHelper.swift; sourceTree = "<group>"; };
+		7A6668A72816B184003E16A6 /* NotificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModel.swift; sourceTree = "<group>"; };
 		7ACCEFCE2812B20E0076746C /* CallController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallController.swift; sourceTree = "<group>"; };
 		7ACCEFD02812B2FF0076746C /* StreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamView.swift; sourceTree = "<group>"; };
 		7ACCEFD22812B6200076746C /* PushRegistryDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistryDelegate.swift; sourceTree = "<group>"; };
+		7ACCEFD52812D98A0076746C /* CallState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallState.swift; sourceTree = "<group>"; };
 		7AE015A82811AF64004A195B /* CommunicationFramework.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CommunicationFramework.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AE015AB2811AF64004A195B /* CommunicationFrameworkApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommunicationFrameworkApp.swift; sourceTree = "<group>"; };
 		7AE015AD2811AF64004A195B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -114,6 +122,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7ACCEFD42812D97A0076746C /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				7ACCEFD52812D98A0076746C /* CallState.swift */,
+			);
+			path = Extension;
+			sourceTree = "<group>";
+		};
 		7AE0159F2811AF64004A195B = {
 			isa = PBXGroup;
 			children = (
@@ -139,6 +155,7 @@
 		7AE015AA2811AF64004A195B /* CommunicationFramework */ = {
 			isa = PBXGroup;
 			children = (
+				7ACCEFD42812D97A0076746C /* Extension */,
 				7AE015F42811D9C5004A195B /* Info.plist */,
 				7AE015F32811D9B3004A195B /* CommunicationFramework.entitlements */,
 				7AE015E42811C5C6004A195B /* CallManager */,
@@ -149,6 +166,7 @@
 				7AE015AB2811AF64004A195B /* CommunicationFrameworkApp.swift */,
 				7AE015AF2811AF68004A195B /* Assets.xcassets */,
 				7AE015B12811AF68004A195B /* Preview Content */,
+				7A6668A32816A4AD003E16A6 /* ServerSettings.plist */,
 			);
 			path = CommunicationFramework;
 			sourceTree = "<group>";
@@ -182,6 +200,7 @@
 			isa = PBXGroup;
 			children = (
 				7AE015D82811B159004A195B /* CallingViewModel.swift */,
+				7A6668A72816B184003E16A6 /* NotificationViewModel.swift */,
 			);
 			path = Viewmodels;
 			sourceTree = "<group>";
@@ -209,6 +228,7 @@
 			isa = PBXGroup;
 			children = (
 				7AE015DB2811B44C004A195B /* CommunicationFrameworkHelper.swift */,
+				7A6668A52816A51D003E16A6 /* PLHelper.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -385,6 +405,7 @@
 			files = (
 				7AE015B32811AF68004A195B /* Preview Assets.xcassets in Resources */,
 				7AE015B02811AF68004A195B /* Assets.xcassets in Resources */,
+				7A6668A42816A4AD003E16A6 /* ServerSettings.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -517,8 +538,10 @@
 				7ACCEFD32812B6200076746C /* PushRegistryDelegate.swift in Sources */,
 				7AE015DC2811B44C004A195B /* CommunicationFrameworkHelper.swift in Sources */,
 				7AE015F22811D706004A195B /* RemoteVideoStreamModel.swift in Sources */,
+				7A6668A82816B184003E16A6 /* NotificationViewModel.swift in Sources */,
 				7AE015E62811C5E3004A195B /* ProviderDelegate.swift in Sources */,
 				7AE015EE2811D681004A195B /* VideoStreamView.swift in Sources */,
+				7ACCEFD62812D98A0076746C /* CallState.swift in Sources */,
 				7AE015D92811B159004A195B /* CallingViewModel.swift in Sources */,
 				7AE015F02811D6AB004A195B /* LocalVideoStreamModel.swift in Sources */,
 				7ACCEFD12812B2FF0076746C /* StreamView.swift in Sources */,
@@ -526,6 +549,7 @@
 				7AE015E02811B960004A195B /* CallView.swift in Sources */,
 				7AE015AC2811AF64004A195B /* CommunicationFrameworkApp.swift in Sources */,
 				7ACCEFCF2812B20E0076746C /* CallController.swift in Sources */,
+				7A6668A62816A51D003E16A6 /* PLHelper.swift in Sources */,
 				7AE015EB2811D62C004A195B /* VideoStreamModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
