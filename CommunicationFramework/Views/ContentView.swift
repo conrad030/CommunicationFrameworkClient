@@ -12,36 +12,74 @@ import SwiftUI
 struct ContentView: View {
     
     @EnvironmentObject var callingViewModel: CallingViewModel
+    @EnvironmentObject var chatViewModel: ChatViewModel
     
     @State private var presentCallView = false
+    @State private var presentChatView = false
+    @State private var showChatLoadingIndicator = false
     
     var body: some View {
         
-        Button {
-            // TODO: Irgendwo muss man den Identifier herbekommen
-            // iPhone 12: 8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00ed-af4e-65f0-ad3a0d000130
-            // iPhone 6s: 8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0
-            self.callingViewModel.startCall(calleeIdentifier: "8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0")
-        } label: {
+        NavigationView {
             
-            Text("Start call")
-                .bold()
-                .foregroundColor(.white)
-                .padding()
-                .background(RoundedRectangle(cornerRadius: 15).foregroundColor(.blue))
-        }
-        .fullScreenCover(isPresented: self.$presentCallView) {
-            
-            CallView()
-                .environmentObject(self.callingViewModel)
+            VStack(spacing: 20) {
+                
+                NavigationLink(destination: ChatView().environmentObject(self.chatViewModel), isActive: self.$presentChatView) {
+                    Text("")
+                }
+                
+                Button {
+                    // TODO: Irgendwo muss man den Identifier herbekommen
+                    // iPhone 12: 8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00ed-af4e-65f0-ad3a0d000130
+                    // iPhone 6s: 8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0
+                    self.callingViewModel.startCall(calleeIdentifier: "8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0")
+                } label: {
+                    
+                    Text("Start call")
+                        .bold()
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 15).foregroundColor(.blue))
+                }
+                .fullScreenCover(isPresented: self.$presentCallView) {
+                    
+                    CallView()
+                        .environmentObject(self.callingViewModel)
+                }
+                
+                Button {
+                    self.showChatLoadingIndicator = true
+                    self.chatViewModel.startChat(with: "8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0", displayName: "Conrad Impostor")
+                } label: {
+                    
+                    ZStack {
+                        
+                        if self.showChatLoadingIndicator {
+                            
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        } else {
+                            
+                            Text("Start chat")
+                                .bold()
+                                .foregroundColor(.white)
+                        }
+                    }
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 15).foregroundColor(.green))
+                }
+            }
+            .navigationBarTitle("Communication Framework", displayMode: .inline)
         }
         .onReceive(self.callingViewModel.$callState) {
             self.presentCallView = $0 == .connected
         }
-        .onAppear {
-            // TODO: Darf erst initialisiert werden, wenn Credentials gesetzt wurden. Bessere Lösung finden.
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.callingViewModel.initCallAgent()
+        .onReceive(self.chatViewModel.$threadId) {
+            if $0 != nil {
+                DispatchQueue.main.async {
+                    self.presentChatView = true
+                    self.showChatLoadingIndicator = false
+                }
             }
         }
     }

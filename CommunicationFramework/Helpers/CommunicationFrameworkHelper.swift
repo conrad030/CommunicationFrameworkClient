@@ -16,6 +16,7 @@ class CommunicationFrameworkHelper {
     private(set) static var hubConnectionUrl: String = ""
     
     /// Azure Communication Service Credentials
+    private(set) static var endpoint: String = ""
     private(set) static var displayName: String = ""
     private(set) static var token: String = ""
     private(set) static var id: String = ""
@@ -32,6 +33,10 @@ class CommunicationFrameworkHelper {
     public static func initNotificationHubCredentials(hubName: String, hubConnectionUrl: String) {
         CommunicationFrameworkHelper.hubName = hubName
         CommunicationFrameworkHelper.hubConnectionUrl = hubConnectionUrl
+    }
+    
+    public static func initACSEndpoint(endpoint: String) {
+        self.endpoint = endpoint
     }
     
     /// Set Azure Communication Service Credentials

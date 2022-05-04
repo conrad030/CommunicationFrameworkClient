@@ -13,18 +13,30 @@ import SwiftUI
 struct CommunicationFrameworkApp: App {
     
     @StateObject private var callingViewModel: CallingViewModel = CallingViewModel.shared
+    @StateObject private var chatViewModel: ChatViewModel = ChatViewModel.shared
     
     init() {
         /// Init notification hub credentials
-        CommunicationFrameworkHelper.initNotificationHubCredentials(hubName: "Communication-Framework-Notification", hubConnectionUrl: "Endpoint=sb://Communication-Framework-Notification.servicebus.windows.net/;SharedAccessKeyName=DefaultListenSharedAccessSignature;SharedAccessKey=EZkjjlZafEAhmfYJJK84spZo6i4/fERp0tFct9ZUZlU=")
+        let hubName = getPlistInfo(resourceName: "Info", key: "HUBNAME")
+        let hubUrl = getPlistInfo(resourceName: "Info", key: "HUBCONNECTIONURL")
+        
+        CommunicationFrameworkHelper.initNotificationHubCredentials(hubName: hubName, hubConnectionUrl: hubUrl)
+        
+        /// Init ACS enpoint
+        let acsEndpoint = getPlistInfo(resourceName: "Info", key: "ACSENDPOINT")
+        
+        CommunicationFrameworkHelper.initACSEndpoint(endpoint: acsEndpoint)
         
         /// Get identifier and token from Server
-        let domain = getPlistInfo(resourceName: "ServerSettings", key: "DOMAIN")
+        let domain = getPlistInfo(resourceName: "Info", key: "DOMAIN")
+        let endpoint = getPlistInfo(resourceName: "Info", key: "ENDPOINT")
+        let query = getPlistInfo(resourceName: "Info", key: "QUERY")
+        
         let defaults = UserDefaults.standard
-        var urlString = domain + "/token"
+        var urlString = domain + endpoint
         // If there is an existing identifier, refresh token instead of creating a new identity
         if let identifier = defaults.string(forKey: "identifier") {
-            urlString += "?identifier=" + identifier
+            urlString += query + identifier
         }
         let url = URL(string: urlString)!
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
@@ -50,6 +62,8 @@ struct CommunicationFrameworkApp: App {
                     print(identifier)
                     /// Init user token credentials
                     CommunicationFrameworkHelper.initUserTokenCredentials(displayName: displayName, token: token, id: identifier)
+                    CallingViewModel.shared.initCallAgent()
+                    ChatViewModel.shared.initChatClient()
                 } catch {
                     print("There was an error while trying to decode credentials: \(error.localizedDescription)")
                 }
@@ -64,6 +78,7 @@ struct CommunicationFrameworkApp: App {
             
             ContentView()
                 .environmentObject(self.callingViewModel)
+                .environmentObject(self.chatViewModel)
         }
     }
 }
