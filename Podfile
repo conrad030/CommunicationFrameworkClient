@@ -9,6 +9,9 @@ target 'CommunicationFramework' do
   pod 'AzureCommunicationCalling', '~> 2.0.0'
   pod 'AzureNotificationHubs-iOS'
   pod 'AzureCommunicationChat'
+  pod 'Amplify'
+  pod 'AmplifyPlugins/AWSS3StoragePlugin'
+  pod 'AmplifyPlugins/AWSCognitoAuthPlugin'
 
   target 'CommunicationFrameworkTests' do
     inherit! :search_paths

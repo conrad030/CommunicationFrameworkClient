@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CONTAINERSTRING</key>
+	<string>$(CONTAINER_CONNECTION_STRING)</string>
 	<key>QUERY</key>
 	<string>$(TOKEN_SERVER_IDENTIFIER_QUERY)</string>
 	<key>ACSENDPOINT</key>

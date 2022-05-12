@@ -24,14 +24,30 @@ struct MessageView: View {
                 Spacer(minLength: 0)
             }
             
-            HStack(spacing: 15) {
+            VStack(spacing: 10) {
                 
-                Text(self.chatMessage.message)
-                    .font(.system(size: 17))
+                if let holder = self.chatMessage.fileHolder {
+                    
+                    if let file = holder.file {
+                        
+                        file.view
+                            .frame(width: 200)
+                    } else {
+                        
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    }
+                }
                 
-                Text(self.chatMessage.createdOn.timeString)
-                    .font(.system(size: 13))
-                    .opacity(0.5)
+                HStack(spacing: 15) {
+                    
+                    Text(self.chatMessage.message ?? "")
+                        .font(.system(size: 17))
+                    
+                    Text(self.chatMessage.createdOn.timeString)
+                        .font(.system(size: 13))
+                        .opacity(0.5)
+                }
             }
             .padding(10)
             .foregroundColor(self.isOwnMessage ? .black : .white)
@@ -39,7 +55,6 @@ struct MessageView: View {
                 RoundedCorners(color: self.isOwnMessage ? Color(.systemGray4) : .blue, tl: self.cornerRadius, tr: self.cornerRadius, bl: self.isOwnMessage ? self.cornerRadius : 0, br: self.isOwnMessage ? 0 : self.cornerRadius)
                     .shadow(radius: 3)
             )
-            
             
             if !self.isOwnMessage {
                 

@@ -1,0 +1,21 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-communicationfw-dev-141942-authRole",
+      "UnauthRoleArn": "arn:aws:iam::943575025161:role/amplify-communicationfw-dev-141942-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::943575025161:role/amplify-communicationfw-dev-141942-authRole",
+      "Region": "eu-central-1",
+      "DeploymentBucketName": "amplify-communicationfw-dev-141942-deployment",
+      "UnauthRoleName": "amplify-communicationfw-dev-141942-unauthRole",
+      "StackName": "amplify-communicationfw-dev-141942",
+      "StackId": "arn:aws:cloudformation:eu-central-1:943575025161:stack/amplify-communicationfw-dev-141942/a5e03a80-cc6d-11ec-816c-026979b2189a",
+      "AmplifyAppId": "d8jae1k3fqjc8"
+    },
+    "categories": {
+      "auth": {
+        "communicationfw2ff5b43a": {},
+        "true": {}
+      }
+    }
+  }
+}

@@ -53,6 +53,7 @@ public class CallingViewModel: NSObject, ObservableObject {
     override private init() {
         super.init()
         _ = PushRegistryDelegate.shared
+        _ = HapticsManager.shared
     }
     
     public func setVoipToken(token: Data?) {
@@ -546,7 +547,6 @@ extension CallingViewModel: IncomingCallDelegate {
 // MARK: - CallDelegate
 extension CallingViewModel: CallDelegate {
     
-    // TODO: Wird nur bei Outcoing calls aufgerufen...
     public func call(_ call: Call, didChangeState args: PropertyChangedEventArgs) {
         print("\n----------------------------------")
         print("onCallStateChanged: \(String(reflecting: call.state.name))")

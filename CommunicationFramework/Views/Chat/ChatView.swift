@@ -22,6 +22,20 @@ struct ChatView: View {
         }
         return dates.sorted { $0.compare($1) == .orderedAscending }
     }
+    @State private var showActionSheet = false
+    @State private var showImagePicker = false
+    @State private var sourceType: UIImagePickerController.SourceType = .photoLibrary
+    @State private var inputImage: UIImage?
+    @State private var openFileImporter = false
+    @State private var pdfFile: PDFFile?
+    private var file: FileRepresentable? {
+        if let image = self.inputImage {
+            return image
+        } else if let pdf = self.pdfFile {
+            return pdf
+        }
+        return nil
+    }
     
     var body: some View {
         
@@ -44,7 +58,7 @@ struct ChatView: View {
                                     .font(.system(size: 18))
                                     .foregroundColor(Color(.systemGray2))
                                 
-                                ForEach(self.chatViewModel.messages.filter { $0.createdOn.isSameDay(as: date) }.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }) { message in
+                                ForEach(self.chatViewModel.messages.filter { $0.createdOn.isSameDay(as: date) }.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }, id: \.hashValue) { message in
                                     
                                     MessageView(chatMessage: message)
                                         .id(message.id)
@@ -70,33 +84,113 @@ struct ChatView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             
-            HStack(spacing: 15) {
+            VStack(spacing: 0) {
                 
-                TextField("Schreibe eine Nachricht...", text: self.$message)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                
-                Button {
-                    self.chatViewModel.sendMessage(text: self.message.trimmingCharacters(in: .whitespacesAndNewlines))
-                    self.message = ""
-                } label: {
+                if let file = self.file {
                     
-                    Text("Senden")
-                        .bold()
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(RoundedRectangle(cornerRadius: 15).foregroundColor(.blue))
+                    ZStack {
+                        
+                        file.view
+                            .shadow(radius: 5)
+                            .padding(.horizontal, 30)
+                        
+                        HStack {
+                            
+                            Spacer(minLength: 0)
+                            
+                            Button {
+                                self.inputImage = nil
+                                self.pdfFile = nil
+                                HapticsManager.shared.standardVibration()
+                            } label: {
+                                
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 25))
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                    }
+                    .padding()
+                    .frame(height: 150)
                 }
-                .disabled(self.message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                .opacity(self.message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? 0.5 : 1)
+                
+                HStack(spacing: 15) {
+                    
+                    Button {
+                        self.showActionSheet = true
+                    } label: {
+                        
+                        Image(systemName: "plus")
+                            .font(.system(size: 25))
+                            .foregroundColor(.blue)
+                    }
+                    
+                    TextField("Schreibe eine Nachricht...", text: self.$message)
+                        .padding(8)
+                        .background(RoundedRectangle(cornerRadius: 10).foregroundColor(Color(.white)))
+                    
+                    if !self.message.isEmpty || self.file != nil {
+
+                        Button {
+                            self.chatViewModel.sendMessage(text: self.message.trimmingCharacters(in: .whitespacesAndNewlines), fileRepresentable: self.file)
+                            self.message = ""
+                            self.inputImage = nil
+                            self.pdfFile = nil
+                        } label: {
+                            
+                            Image(systemName: "location.circle.fill")
+                                .font(.system(size: 35))
+                                .rotationEffect(Angle(degrees: 45))
+                                .foregroundColor(.blue)
+                        }
+                        .zIndex(1)
+                        .transition(.opacity.combined(with: .move(edge: .trailing)))
+                    }
+                }
+                .frame(height: 40)
+                .padding()
             }
-            .padding()
+            .animation(.easeInOut(duration: 0.2))
             .background(
-                Color(.systemGray4)
+                Color(.systemGray6)
                     .shadow(radius: 5)
                     .edgesIgnoringSafeArea(.bottom)
+                    .animation(.easeInOut(duration: 0.2))
             )
         }
-        .background(Color(.systemGray6))
+        .background(Color(.white))
+        .confirmationDialog("", isPresented: self.$showActionSheet, titleVisibility: .hidden) {
+            Button("Kamera") {
+                self.sourceType = .camera
+                self.showImagePicker = true
+            }
+            Button("Foto- oder Videomediathek") {
+                self.sourceType = .photoLibrary
+                self.showImagePicker = true
+            }
+            Button("Dokument") {
+                self.openFileImporter = true
+            }
+            Button("Abbrechen", role: .cancel) {
+            }
+        }
+        .fullScreenCover(isPresented: self.$showImagePicker, onDismiss: {
+            if self.inputImage != nil {
+                self.pdfFile = nil
+            }
+        }) {
+            ImagePicker(image: self.$inputImage, sourceType: self.sourceType)
+                .edgesIgnoringSafeArea(.all)
+        }
+        .fileImporter(isPresented: self.$openFileImporter, allowedContentTypes: [.pdf]) { res in
+            self.inputImage = nil
+            do {
+                self.pdfFile = PDFFile(url: try res.get())
+            } catch {
+                print("Error: \(error.localizedDescription)")
+            }
+            self.openFileImporter = false
+        }
         .navigationBarTitle("Chat mit \(self.chatViewModel.chatPartnerName ?? "")", displayMode: .inline)
         .onAppear {
             print(UIScrollView.appearance().keyboardDismissMode.rawValue)
