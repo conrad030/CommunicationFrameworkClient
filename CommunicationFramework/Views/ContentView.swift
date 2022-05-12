@@ -46,10 +46,12 @@ struct ContentView: View {
                     CallView()
                         .environmentObject(self.callingViewModel)
                 }
+                .disabled(!self.callingViewModel.enableCallButton)
+                .opacity(self.callingViewModel.enableCallButton ? 1 : 0.5)
                 
                 Button {
                     self.showChatLoadingIndicator = true
-                    self.chatViewModel.startChat(with: "8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0", displayName: "Conrad Impostor")
+                    self.chatViewModel.startChat(with: "8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0", displayName: "Conrad iPhone 6s")
                 } label: {
                     
                     ZStack {
@@ -68,6 +70,8 @@ struct ContentView: View {
                         .padding()
                         .background(RoundedRectangle(cornerRadius: 15).foregroundColor(.green))
                 }
+                .disabled(!self.chatViewModel.enableChatButton)
+                .opacity(self.chatViewModel.enableChatButton ? 1 : 0.5)
             }
             .navigationBarTitle("Communication Framework", displayMode: .inline)
         }

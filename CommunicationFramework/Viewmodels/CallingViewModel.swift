@@ -31,6 +31,8 @@ public class CallingViewModel: NSObject, ObservableObject {
     @Published public var incomingCallPushNotification: PushNotificationInfo?
     @Published public var isMicrophoneMuted: Bool = false
     @Published public var isLocalVideoStreamEnabled: Bool = false
+    // TODO: Nicht hier und nicht so
+    @Published public var enableCallButton: Bool = false
     
     private var communicationUserToken: CommunicationUserTokenModel? {
         if CommunicationFrameworkHelper.credentialsExist {
@@ -123,8 +125,9 @@ public class CallingViewModel: NSObject, ObservableObject {
     /// Register push notifications with voip token
     private func registerPushNotifications(voipToken: Data) {
         self.callAgent?.registerPushNotifications(deviceToken: voipToken, completionHandler: { (error) in
-            if(error == nil) {
+            if error == nil {
                 print("Successfully registered to VoIP push notification.\n")
+                self.enableCallButton = true
             } else {
                 print("Failed to register VoIP push notification.\(String(describing: error))\n")
             }

@@ -41,6 +41,10 @@ class ChatViewModel: NSObject, ObservableObject {
     @Published public var messages: [ChatMessage] = []
     @Published public var chatPartnerName: String?
     @Published public var loadedMessages = true
+    // TODO: Nicht hier und nicht so
+    public var enableChatButton: Bool {
+        !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty
+    }
     
     private var hasChatThreadClient: Bool {
         self.chatThreadClient != nil

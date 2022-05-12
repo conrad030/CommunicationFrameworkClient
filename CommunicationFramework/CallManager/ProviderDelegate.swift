@@ -66,11 +66,13 @@ class ProviderDelegate: NSObject {
     public func reportNewIncomingCall(callId: UUID, handle: String, hasVideo: Bool = false, completion: @escaping ((Error?) -> Void)) {
         // Construct a CXCallUpdate describing the incoming call, including the caller.
         let update = CXCallUpdate()
-        update.remoteHandle = CXHandle(type: .generic, value: "Incoming call from \(handle)")
+        update.remoteHandle = CXHandle(type: .generic, value: "Incoming call")
+        update.localizedCallerName = "Eingehender Anruf von \(handle)"
         update.hasVideo = hasVideo
 
         // Report the incoming call to the system.
         provider?.reportNewIncomingCall(with: callId, update: update) { error in
+            // TODO: Loggen. Hier kommt vielleicht der Fehler für die fehlschlagenden Anrufe her.
             if let error = error {
                 completion(error)
             } else {
