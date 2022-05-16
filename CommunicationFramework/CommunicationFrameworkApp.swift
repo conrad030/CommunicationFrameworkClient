@@ -59,7 +59,6 @@ struct CommunicationFrameworkApp: App {
                     let identifier = credentials["identifier"]!
                     // Store identifier in user defaults
                     defaults.set(identifier, forKey: "identifier")
-                    print(identifier)
                     /// Init user token credentials
                     CommunicationFrameworkHelper.initUserTokenCredentials(displayName: displayName, token: token, id: identifier)
                     CallingViewModel.shared.initCallAgent()

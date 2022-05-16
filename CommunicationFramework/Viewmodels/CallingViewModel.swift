@@ -104,6 +104,7 @@ public class CallingViewModel: NSObject, ObservableObject {
                         self.acceptIncomingCall(callId: callId)
                     }
 
+                    // TODO: Wird auch aufgerufen, wenn Anruf von Callee beendet wird
                     ProviderDelegate.shared.endCall = { callId in
                         self.endCall(callId: callId)
                     }

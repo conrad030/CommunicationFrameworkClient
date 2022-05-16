@@ -190,7 +190,7 @@ class ChatViewModel: NSObject, ObservableObject {
         for index in 0..<self.messages.count {
             if let holder = self.messages[index].fileHolder, holder.file?.data == nil {
                 semaphore.wait()
-                self.fileStorageModel.getFile(for: self.messages[index].fileHolder!.id.uuidString) { data, error in
+                self.fileStorageModel.getFile(for: holder.id.uuidString) { data, error in
                     if let error = error {
                         print("An error accured while downloading file: \(error.localizedDescription)")
                     } else if let data = data {
@@ -201,8 +201,8 @@ class ChatViewModel: NSObject, ObservableObject {
                         } else if holder.type == .pdf {
                             print("File is an PDF.")
                             file = PDFFile(data: data)
-                            file?.name = holder.name
                         }
+                        file?.name = holder.name
                         // TODO: Bessere Lösung finden als hier den hashValue als id zu verwenden (Changes werden wahrscheinlich nicht detected, weil UIImage eine class ist)
                         DispatchQueue.main.async {
                             self.messages[index].fileHolder?.file = file

@@ -67,7 +67,7 @@ class ProviderDelegate: NSObject {
         // Construct a CXCallUpdate describing the incoming call, including the caller.
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: "Incoming call")
-        update.localizedCallerName = "Eingehender Anruf von \(handle)"
+        update.localizedCallerName = handle
         update.hasVideo = hasVideo
 
         // Report the incoming call to the system.
