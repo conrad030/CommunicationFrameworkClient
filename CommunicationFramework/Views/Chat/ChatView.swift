@@ -14,7 +14,7 @@ struct ChatView: View {
     @State private var message = ""
     private var dates: [Date] {
         var dates: [Date] = []
-        for message in self.chatViewModel.messages {
+        for message in self.chatViewModel.chatMessages {
             if !dates.contains(where: { $0.isSameDay(as: message.createdOn) }) {
                 print(message.createdOn)
                 dates.append(message.createdOn)
@@ -58,7 +58,7 @@ struct ChatView: View {
                                     .font(.system(size: 18))
                                     .foregroundColor(Color(.systemGray2))
                                 
-                                ForEach(self.chatViewModel.messages.filter { $0.createdOn.isSameDay(as: date) }.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }, id: \.hashValue) { message in
+                                ForEach(self.chatViewModel.chatMessages.filter { $0.createdOn.isSameDay(as: date) }.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }) { message in
                                     
                                     MessageView(chatMessage: message)
                                         .id(message.id)
@@ -67,13 +67,13 @@ struct ChatView: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .onChange(of: self.chatViewModel.messages.count) { _ in
+                        .onChange(of: self.chatViewModel.chatMessages.count) { _ in
                             withAnimation {
-                                value.scrollTo(self.chatViewModel.messages.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }.last?.id)
+                                value.scrollTo(self.chatViewModel.chatMessages.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }.last?.id)
                             }
                         }
                         .onAppear {
-                            value.scrollTo(self.chatViewModel.messages.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }.last?.id)
+                            value.scrollTo(self.chatViewModel.chatMessages.sorted { $0.createdOn.compare($1.createdOn) == .orderedAscending }.last?.id)
                         }
                     }
                 }

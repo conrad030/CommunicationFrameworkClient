@@ -7,8 +7,6 @@
 
 import Foundation
 
-
-
 class CommunicationFrameworkHelper {
     
     /// Azure Notification Hub Credentials

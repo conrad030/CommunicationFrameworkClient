@@ -12,6 +12,8 @@ import SwiftUI
 @main
 struct CommunicationFrameworkApp: App {
     
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    
     @StateObject private var callingViewModel: CallingViewModel = CallingViewModel.shared
     @StateObject private var chatViewModel: ChatViewModel = ChatViewModel.shared
     
@@ -39,9 +41,11 @@ struct CommunicationFrameworkApp: App {
             urlString += query + identifier
         }
         let url = URL(string: urlString)!
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        var request = URLRequest(url: url)
+        request.setValue(getPlistInfo(resourceName: "Info", key: "API_KEY"), forHTTPHeaderField: "API-Key")
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                print("Error with fetching films: \(error)")
+                print("Error with fetching credentials: \(error)")
                 return
             }
             

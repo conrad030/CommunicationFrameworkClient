@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MessageView: View {
     
-    var chatMessage: ChatMessage
+    @ObservedObject var chatMessage: ChatMessage
     private var isOwnMessage: Bool {
         self.chatMessage.senderIdentifier == CommunicationFrameworkHelper.id
     }
@@ -26,17 +26,10 @@ struct MessageView: View {
             
             VStack(spacing: 10) {
                 
-                if let holder = self.chatMessage.fileHolder {
+                if let file = self.chatMessage.file {
                     
-                    if let file = holder.file {
-                        
-                        file.view
-                            .frame(width: 200)
-                    } else {
-                        
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    }
+                    file.view
+                        .frame(width: 200)
                 }
                 
                 HStack(spacing: 15) {
@@ -66,6 +59,6 @@ struct MessageView: View {
 
 struct MessageView_Previews: PreviewProvider {
     static var previews: some View {
-        MessageView(chatMessage: ChatMessage(senderIdentifier: UUID().uuidString, sender: "Me", message: "Test message", createdOn: Date()))
+        MessageView(chatMessage: ChatMessage())
     }
 }

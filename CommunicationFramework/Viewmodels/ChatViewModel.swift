@@ -8,6 +8,7 @@
 import SwiftUI
 import AzureCommunicationCommon
 import AzureCommunicationChat
+import CoreData
 
 class ChatViewModel: NSObject, ObservableObject {
     
@@ -38,7 +39,10 @@ class ChatViewModel: NSObject, ObservableObject {
             }
         }
     }
-    @Published public var messages: [ChatMessage] = []
+    private var context: NSManagedObjectContext {
+        AppDelegate.instance!.persistentContainer.viewContext
+    }
+    @Published var chatMessages: [ChatMessage] = []
     @Published public var chatPartnerName: String?
     @Published public var loadedMessages = true
     // TODO: Nicht hier und nicht so
@@ -52,6 +56,19 @@ class ChatViewModel: NSObject, ObservableObject {
     
     override private init() {
         super.init()
+        self.chatMessages = self.readData()
+    }
+    
+    private func readData() -> [ChatMessage] {
+        let fetchRequest: NSFetchRequest<ChatMessage> = ChatMessage.fetchRequest()
+        fetchRequest.sortDescriptors = [NSSortDescriptor(keyPath: \ChatMessage.createdOn_, ascending: true)]
+        do {
+            let messages = try self.context.fetch(fetchRequest)
+            return messages
+        } catch let error as NSError {
+            print("Error fetching ProgrammingLanguages: \(error.localizedDescription), \(error.userInfo)")
+            return []
+        }
     }
     
     public func initChatClient() {
@@ -86,9 +103,27 @@ class ChatViewModel: NSObject, ObservableObject {
                         let sender = event.sender as? CommunicationUserIdentifier
                         /// Only add message if sender is the chat partner
                         if let sender = sender, sender.identifier != CommunicationFrameworkHelper.id {
-                            let chatMessage = ChatMessage(senderIdentifier: sender.identifier, sender: event.senderDisplayName ?? "", message: !event.message.isEmpty ? event.message : nil, createdOn: event.createdOn?.value ?? Date())
-                            withAnimation {
-                                self.messages.append(chatMessage)
+                            if let id = event.metadata?["messageId"], let id = id, !self.chatMessages.contains(where: { $0.id.uuidString == id }) {
+                                withAnimation {
+                                    let chatMessage = ChatMessage(context: self.context)
+                                    chatMessage.id = UUID(uuidString: id) ?? UUID()
+                                    chatMessage.senderIdentifier = sender.identifier
+                                    chatMessage.message = !event.message.isEmpty ? event.message : nil
+                                    chatMessage.createdOn = event.createdOn?.value ?? Date()
+                                    if let id = event.metadata?["fileId"], let id = id, let typeString = event.metadata?["type"], let type = FileType.getTypeForString(string: typeString ?? ""), let fileName = event.metadata?["fileName"], let fileName = fileName {
+                                        let file = File(context: self.context)
+                                        file.id = UUID(uuidString: id) ?? UUID()
+                                        file.name = fileName
+                                        file.type = type
+                                        chatMessage.file = file
+                                        self.downloadFileData(file: file) {
+                                            DispatchQueue.main.async {
+                                                chatMessage.objectWillChange.send()
+                                            }
+                                        }
+                                    }
+                                    self.save(message: chatMessage)
+                                }
                             }
                         }
                     }
@@ -166,13 +201,20 @@ class ChatViewModel: NSObject, ObservableObject {
                 if let items = listMessagesResponse.items {
                     for item in items {
                         let sender = item.sender as? CommunicationUserIdentifier
-                        var holder: FileHolder?
-                        if let id = item.metadata?["fileId"], let id = id, let typeString = item.metadata?["type"], let type = FileType.getTypeForString(string: typeString ?? ""), let fileName = item.metadata?["fileName"], let fileName = fileName {
-                            holder = FileHolder(id: id, fileType: type, name: fileName)
-                        }
-                        if let id = item.metadata?["messageId"], let id = id, !self.messages.contains(where: { $0.id.uuidString == id }) {
-                            let chatMessage = ChatMessage(id: id, senderIdentifier: sender?.identifier ?? "", sender: item.senderDisplayName ?? "Unbekannt", message: item.content?.message ?? "Kein Inhalt", createdOn: item.createdOn.value, fileWrapper: holder)
-                            self.messages.append(chatMessage)
+                        if let id = item.metadata?["messageId"], let id = id, !self.chatMessages.contains(where: { $0.id.uuidString == id }) {
+                            let chatMessage = ChatMessage(context: self.context)
+                            chatMessage.id = UUID(uuidString: id) ?? UUID()
+                            chatMessage.senderIdentifier = sender?.identifier ?? ""
+                            chatMessage.message = item.content?.message
+                            chatMessage.createdOn = item.createdOn.value
+                            if let id = item.metadata?["fileId"], let id = id, let typeString = item.metadata?["type"], let type = FileType.getTypeForString(string: typeString ?? ""), let fileName = item.metadata?["fileName"], let fileName = fileName {
+                                let file = File(context: self.context)
+                                file.id = UUID(uuidString: id) ?? UUID()
+                                file.name = fileName
+                                file.type = type
+                                chatMessage.file = file
+                            }
+                            self.save(message: chatMessage)
                         }
                     }
                 }
@@ -187,26 +229,12 @@ class ChatViewModel: NSObject, ObservableObject {
     
     private func setFileDataForMessages() {
         let semaphore = DispatchSemaphore(value: 1)
-        for index in 0..<self.messages.count {
-            if let holder = self.messages[index].fileHolder, holder.file?.data == nil {
+        for message in self.chatMessages {
+            if let file = message.file, file.data == nil {
                 semaphore.wait()
-                self.fileStorageModel.getFile(for: holder.id.uuidString) { data, error in
-                    if let error = error {
-                        print("An error accured while downloading file: \(error.localizedDescription)")
-                    } else if let data = data {
-                        var file: FileRepresentable?
-                        if holder.type == .jpg {
-                            print("File is an image.")
-                            file = UIImage(data: data)
-                        } else if holder.type == .pdf {
-                            print("File is an PDF.")
-                            file = PDFFile(data: data)
-                        }
-                        file?.name = holder.name
-                        // TODO: Bessere Lösung finden als hier den hashValue als id zu verwenden (Changes werden wahrscheinlich nicht detected, weil UIImage eine class ist)
-                        DispatchQueue.main.async {
-                            self.messages[index].fileHolder?.file = file
-                        }
+                self.downloadFileData(file: file) {
+                    DispatchQueue.main.async {
+                        message.objectWillChange.send()
                     }
                     semaphore.signal()
                 }
@@ -214,12 +242,30 @@ class ChatViewModel: NSObject, ObservableObject {
         }
     }
     
+    private func downloadFileData(file: File, completion: @escaping () -> Void) {
+        self.fileStorageModel.getFile(for: file.id.uuidString) { data, error in
+            if let error = error {
+                print("An error accured while downloading file: \(error.localizedDescription)")
+            } else if let data = data {
+                DispatchQueue.main.async {
+                    file.data = data
+                    try? self.context.save()
+                    withAnimation {
+                        self.chatMessages = self.readData()
+                    }
+                }
+            }
+            completion()
+        }
+    }
+    
     /// Send a message in a thread
     public func sendMessage(text: String, fileRepresentable: FileRepresentable?) {
         let id = UUID()
-        var metadata: [String: String] = ["messageId": UUID().uuidString]
+        let fileId = UUID()
+        var metadata: [String: String] = ["messageId": id.uuidString]
         if let fileRepresentable = fileRepresentable {
-            metadata["fileId"] = id.uuidString
+            metadata["fileId"] = fileId.uuidString
             metadata["type"] = fileRepresentable.fileType.rawValue
             metadata["fileName"] = fileRepresentable.name
         }
@@ -233,7 +279,20 @@ class ChatViewModel: NSObject, ObservableObject {
         
         if self.hasChatThreadClient {
             withAnimation {
-                self.messages.append(ChatMessage(senderIdentifier: CommunicationFrameworkHelper.id, sender: CommunicationFrameworkHelper.displayName, message: !message.content.isEmpty ? message.content : nil, createdOn: Date(), fileWrapper: fileRepresentable != nil ? FileHolder(file: fileRepresentable!) : nil))
+                let chatMessage = ChatMessage(context: self.context)
+                chatMessage.id = id
+                chatMessage.senderIdentifier = CommunicationFrameworkHelper.id
+                chatMessage.message = !message.content.isEmpty ? message.content : nil
+                chatMessage.createdOn = Date()
+                if let fileRepresentable = fileRepresentable {
+                    let file = File(context: self.context)
+                    file.id = fileId
+                    file.name = fileRepresentable.name
+                    file.type = fileRepresentable.fileType
+                    file.data = fileRepresentable.data
+                    chatMessage.file = file
+                }
+                self.save(message: chatMessage)
             }
             
         } else {
@@ -241,7 +300,7 @@ class ChatViewModel: NSObject, ObservableObject {
         }
         
         if let fileRepresentable = fileRepresentable {
-            self.uploadFile(id: id, fileRepresentable: fileRepresentable) { success in
+            self.uploadFile(id: fileId, fileRepresentable: fileRepresentable) { success in
                 if success {
                     self.sendMessage(message: message)
                 } else {
@@ -301,6 +360,13 @@ class ChatViewModel: NSObject, ObservableObject {
                 }
             }
         }
+    }
+    
+    private func save(message: ChatMessage) {
+        withAnimation {
+            self.chatMessages.append(message)
+        }
+        try? self.context.save()
     }
     
     private func getParticipants(completion: @escaping ([ChatParticipant]?) -> Void) {
