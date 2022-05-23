@@ -38,12 +38,7 @@ struct PDFFile: FileDocument, FileRepresentable {
     var storedName: String?
     
     var name: String {
-        get {
-            self.storedName ?? self.url.lastPathComponent
-        }
-        set {
-            self.storedName = newValue
-        }
+        self.storedName ?? self.url.lastPathComponent
     }
     
     var fileType: FileType {
@@ -53,10 +48,30 @@ struct PDFFile: FileDocument, FileRepresentable {
     static var readableContentTypes: [UTType]{[.pdf]}
     
     private var innerData: Data?
-    private var url: URL = URL(fileURLWithPath: "")
+    private var storedUrl: URL?
+    private var id = UUID()
+    
+    private var url: URL {
+        get {
+            if let storedUrl = self.storedUrl {
+                return storedUrl
+            } else {
+                let fileManager = FileManager.default
+                let urls = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)
+                let cachesDirectoryUrl = urls[0]
+                return cachesDirectoryUrl.appendingPathComponent("File-\(self.id.uuidString).pdf")
+            }
+        }
+        set {
+            self.storedUrl = newValue
+        }
+    }
     
     init(data: Data) {
         self.innerData = data
+        //Store file in cache and return url
+        let fileManager = FileManager.default
+        fileManager.createFile(atPath: self.url.path, contents: data)
     }
     
     init(url: URL) {

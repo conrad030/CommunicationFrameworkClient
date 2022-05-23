@@ -27,11 +27,7 @@ extension UIImage: FileRepresentable {
         return Data()
     }
     public var name: String {
-        get {
-            "chatImage.jpeg"
-        }
-        set {
-        }
+        "ChatImage.jpeg"
     }
     public var fileType: FileType {
         .jpg

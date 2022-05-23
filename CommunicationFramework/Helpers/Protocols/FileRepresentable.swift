@@ -11,6 +11,6 @@ protocol FileRepresentable {
     
     var view: AnyView { get }
     var data: Data { get }
-    var name: String { get set }
+    var name: String { get }
     var fileType: FileType { get }
 }

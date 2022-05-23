@@ -14,8 +14,26 @@ struct MessageView: View {
         self.chatMessage.senderIdentifier == CommunicationFrameworkHelper.id
     }
     private let cornerRadius: CGFloat = 15
+    @State private var showFileExporter = false
+    @State private var showSaveSuccessAlert = false
+    @State private var showSaveErrorAlert = false
     
     var body: some View {
+        
+        ZStack {
+            
+            Text("")
+                .alert(Text("Erfolgreich heruntergeladen"), isPresented: self.$showSaveSuccessAlert) {
+                    Button("Ok", role: .cancel) { }
+                }
+            
+            Text("")
+                .alert(Text("Fehler"), isPresented: self.$showSaveErrorAlert, actions: {
+                    Button("Ok", role: .cancel) { }
+                }) {
+                    Text("Beim herunterladen ist ein Fehler aufgetreten.")
+                }
+        }
         
         HStack {
             
@@ -28,8 +46,30 @@ struct MessageView: View {
                 
                 if let file = self.chatMessage.file {
                     
-                    file.view
+                    ZStack {
+                        
+                        if let data = file.data {
+                            
+                            Text("")
+                                .fileExporter(isPresented: self.$showFileExporter, document: PDFFile(data: data), contentType: .pdf) { result in
+                                    switch result {
+                                    case .success:
+                                        self.showSaveSuccessAlert = true
+                                    case .failure(let error):
+                                        print("Error while trying to save pdf file: \(error.localizedDescription)")
+                                        self.showSaveErrorAlert = true
+                                    }
+                                }
+                        }
+                        
+                        Button {
+                            self.showFileExporter = true
+                        } label: {
+                            file.view
+                        }
                         .frame(width: 200)
+                        .disabled(file.type == .jpg || file.data == nil)
+                    }
                 }
                 
                 HStack(spacing: 15) {

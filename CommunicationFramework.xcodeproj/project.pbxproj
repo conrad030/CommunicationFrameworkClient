@@ -29,7 +29,6 @@
 		7A74C30B28328E7C00E12FCD /* ChatStore.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7A74C30928328E7C00E12FCD /* ChatStore.xcdatamodeld */; };
 		7A8A865928199E8D00E86A64 /* Pods_CommunicationFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1132CF220F1A602D76135BF4 /* Pods_CommunicationFramework.framework */; };
 		7AB220FD2829581700070312 /* PDFFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB220FC2829581700070312 /* PDFFile.swift */; };
-		7AB221012829892400070312 /* FileHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB221002829892400070312 /* FileHolder.swift */; };
 		7ACCEFCF2812B20E0076746C /* CallController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFCE2812B20E0076746C /* CallController.swift */; };
 		7ACCEFD12812B2FF0076746C /* StreamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFD02812B2FF0076746C /* StreamView.swift */; };
 		7ACCEFD32812B6200076746C /* PushRegistryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFD22812B6200076746C /* PushRegistryDelegate.swift */; };
@@ -102,7 +101,6 @@
 		7A74C30A28328E7C00E12FCD /* ChatStore.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ChatStore.xcdatamodel; sourceTree = "<group>"; };
 		7A7E48C82819487000E74614 /* Trouter.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Trouter.xcframework; path = Pods/Trouter/Trouter.xcframework; sourceTree = "<group>"; };
 		7AB220FC2829581700070312 /* PDFFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFFile.swift; sourceTree = "<group>"; };
-		7AB221002829892400070312 /* FileHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileHolder.swift; sourceTree = "<group>"; };
 		7ACCEFCE2812B20E0076746C /* CallController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallController.swift; sourceTree = "<group>"; };
 		7ACCEFD02812B2FF0076746C /* StreamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamView.swift; sourceTree = "<group>"; };
 		7ACCEFD22812B6200076746C /* PushRegistryDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistryDelegate.swift; sourceTree = "<group>"; };
@@ -179,7 +177,6 @@
 				7A74C30C28329B7600E12FCD /* Store */,
 				7A62D2F12822BB28001D1C80 /* FileStorageModel.swift */,
 				7AB220FC2829581700070312 /* PDFFile.swift */,
-				7AB221002829892400070312 /* FileHolder.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -653,7 +650,6 @@
 				7ACCEFD32812B6200076746C /* PushRegistryDelegate.swift in Sources */,
 				7A22A9B72824190A008C7124 /* Encodable.swift in Sources */,
 				7A0B723A28355A3800600AD3 /* AppDelegate.swift in Sources */,
-				7AB221012829892400070312 /* FileHolder.swift in Sources */,
 				7AE015DC2811B44C004A195B /* CommunicationFrameworkHelper.swift in Sources */,
 				7AE015F22811D706004A195B /* RemoteVideoStreamModel.swift in Sources */,
 				7A1E83A6281C1AEC00A21CEF /* MessageView.swift in Sources */,
