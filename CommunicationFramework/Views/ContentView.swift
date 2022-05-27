@@ -78,8 +78,8 @@ struct ContentView: View {
         .onReceive(self.callingViewModel.$callState) {
             self.presentCallView = $0 == .connected
         }
-        .onReceive(self.chatViewModel.$threadId) {
-            if $0 != nil {
+        .onReceive(self.chatViewModel.$chatIsSetup) {
+            if $0 {
                 DispatchQueue.main.async {
                     self.presentChatView = true
                     self.showChatLoadingIndicator = false

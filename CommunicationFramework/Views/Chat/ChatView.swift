@@ -41,7 +41,7 @@ struct ChatView: View {
         
         VStack(spacing: 0) {
             
-            if !self.chatViewModel.loadedMessages {
+            if self.chatViewModel.loadedMessages {
                 
                 ScrollView {
                     
@@ -193,11 +193,11 @@ struct ChatView: View {
         }
         .navigationBarTitle("Chat mit \(self.chatViewModel.chatPartnerName ?? "")", displayMode: .inline)
         .onAppear {
-            print(UIScrollView.appearance().keyboardDismissMode.rawValue)
             UIScrollView.appearance().keyboardDismissMode = .onDrag
         }
         .onDisappear {
             UIScrollView.appearance().keyboardDismissMode = .interactive
+            self.chatViewModel.leaveChat()
         }
     }
 }

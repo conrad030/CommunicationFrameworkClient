@@ -66,7 +66,7 @@ struct CommunicationFrameworkApp: App {
                     /// Init user token credentials
                     CommunicationFrameworkHelper.initUserTokenCredentials(displayName: displayName, token: token, id: identifier)
                     CallingViewModel.shared.initCallAgent()
-                    ChatViewModel.shared.initChatClient()
+                    ChatViewModel.shared.initChatViewModel()
                 } catch {
                     print("There was an error while trying to decode credentials: \(error.localizedDescription)")
                 }

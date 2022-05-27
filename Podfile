@@ -12,6 +12,7 @@ target 'CommunicationFramework' do
   pod 'Amplify'
   pod 'AmplifyPlugins/AWSS3StoragePlugin'
   pod 'AmplifyPlugins/AWSCognitoAuthPlugin'
+  pod 'MaterialComponents/Snackbar', '~> 63.0.0'
 
   target 'CommunicationFrameworkTests' do
     inherit! :search_paths

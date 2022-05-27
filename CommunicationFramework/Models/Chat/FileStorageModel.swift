@@ -61,4 +61,16 @@ public class FileStorageModel {
             completion(data, nil)
         })
     }
+    
+    public func deleteFile(for id: String, completion: @escaping (String?, Error?) -> Void) {
+        self.resultSink = Amplify.Storage.remove(key: id).resultPublisher.sink(receiveCompletion: {
+            if case let .failure(storageError) = $0 {
+                print("Failed: \(storageError.errorDescription). \(storageError.recoverySuggestion)")
+                completion(nil, storageError)
+            }
+        }, receiveValue: { data in
+            print("Completed: Deleted \(data)")
+            completion(data, nil)
+        })
+    }
 }

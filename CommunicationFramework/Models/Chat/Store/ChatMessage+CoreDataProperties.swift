@@ -9,7 +9,6 @@
 import Foundation
 import CoreData
 
-
 extension ChatMessage: Identifiable {
 
     @nonobjc public class func fetchRequest() -> NSFetchRequest<ChatMessage> {
@@ -21,6 +20,10 @@ extension ChatMessage: Identifiable {
     @NSManaged public var createdOn_: Date?
     @NSManaged public var file: File?
     @NSManaged private var senderIdentifier_: String?
+    @NSManaged public var chatMessageId: String?
+    @NSManaged public var isInvalidated: Bool
+    @NSManaged private var status_: Int16
+    @NSManaged public var isEdited: Bool
     
     public var id: UUID {
         get {
@@ -49,6 +52,15 @@ extension ChatMessage: Identifiable {
         }
         set {
             self.senderIdentifier_ = newValue
+        }
+    }
+    
+    var status: ChatMessageStatus {
+        get {
+            ChatMessageStatus(rawValue: self.status_) ?? .pending
+        }
+        set {
+            self.status_ = newValue.rawValue
         }
     }
 }
