@@ -19,7 +19,7 @@ class ChatViewModel: NSObject, ObservableObject {
     @Published private var chatModel: ChatModel = AzureChatModel()
     private var anyCancellable: AnyCancellable? = nil
     
-    private var fileStorageModel: FileStorageModel = FileStorageModel()
+    private var fileStorageModel: FileStorage = AmplifyFileStorage()
     
     private var context: NSManagedObjectContext {
         AppDelegate.instance!.persistentContainer.viewContext
@@ -43,6 +43,7 @@ class ChatViewModel: NSObject, ObservableObject {
         super.init()
         self.chatMessages = self.readData()
         self.chatModel.delegate = self
+        /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected
         if let observableObject = chatModel as? AzureChatModel {
             self.anyCancellable = observableObject.objectWillChange.sink { [weak self] _ in
                 self?.objectWillChange.send()

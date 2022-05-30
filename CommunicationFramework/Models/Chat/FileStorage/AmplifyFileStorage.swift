@@ -11,7 +11,7 @@ import Combine
 import Amplify
 import AmplifyPlugins
 
-public class FileStorageModel {
+public class AmplifyFileStorage: FileStorage {
     
     private var resultSink: AnyCancellable?
     private var progressSink: AnyCancellable?
