@@ -4,7 +4,6 @@
         <attribute name="chatMessageId" optional="YES" attributeType="String"/>
         <attribute name="createdOn_" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="id_" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="isEdited" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isInvalidated" optional="YES" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="message" optional="YES" attributeType="String"/>
         <attribute name="senderIdentifier_" optional="YES" attributeType="String"/>
@@ -29,7 +28,7 @@
         </uniquenessConstraints>
     </entity>
     <elements>
-        <element name="ChatMessage" positionX="-260.8148803710938" positionY="-9" width="128" height="164"/>
+        <element name="ChatMessage" positionX="-260.8148803710938" positionY="-9" width="128" height="149"/>
         <element name="File" positionX="-74.2254638671875" positionY="-56.23165893554688" width="128" height="118"/>
     </elements>
 </model>

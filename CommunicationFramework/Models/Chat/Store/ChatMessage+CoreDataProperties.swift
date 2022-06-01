@@ -23,7 +23,6 @@ extension ChatMessage: Identifiable {
     @NSManaged public var chatMessageId: String?
     @NSManaged public var isInvalidated: Bool
     @NSManaged private var status_: Int16
-    @NSManaged public var isEdited: Bool
     
     public var id: UUID {
         get {

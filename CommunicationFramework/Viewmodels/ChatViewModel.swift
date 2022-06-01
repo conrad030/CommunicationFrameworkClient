@@ -302,7 +302,7 @@ extension ChatViewModel: ChatModelDelegate {
         }
     }
     
-    // TODO: Nicht schön. Delegate wird ChatModel wird in Delegate von ChatModel erneut aufgerufen...
+    // TODO: Nicht schön. Diese Methode wird direkt nach handleGetThreadMessages in AzureChatModel aufgerufen... Lässt sich bestimmt irgendwie zusamenfassen.
     public func sendReadReceipts() {
         if let message = self.chatMessages.filter({ $0.senderIdentifier != CommunicationFrameworkHelper.id && $0.status != .read }).last, let messageId = message.chatMessageId {
             self.chatModel.sendReadReceipt(for: messageId)

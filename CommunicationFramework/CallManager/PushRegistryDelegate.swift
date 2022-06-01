@@ -39,6 +39,7 @@ extension PushRegistryDelegate: PKPushRegistryDelegate {
 
         if type == .voIP {
             let incomingCallPushNotification = PushNotificationInfo.fromDictionary(payload.dictionaryPayload)
+            // TODO: Anders an die Werte kommen, damit unabhängig von Azure
             let callId = incomingCallPushNotification.callId
             let handle = incomingCallPushNotification.fromDisplayName
             let hasVideo = incomingCallPushNotification.incomingWithVideo
@@ -52,6 +53,7 @@ extension PushRegistryDelegate: PKPushRegistryDelegate {
                 }
                 completion()
                 
+                // TODO: Direkt Payload übergeben, um unabhängig von Azure zu sein
                 CallingViewModel.shared.handlePushNotification(incomingCallPushNotification: incomingCallPushNotification)
             }
         }

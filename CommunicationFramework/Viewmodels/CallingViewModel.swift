@@ -36,7 +36,7 @@ public class CallingViewModel: NSObject, ObservableObject {
     
     private var communicationUserToken: CommunicationUserTokenModel? {
         if CommunicationFrameworkHelper.credentialsExist {
-            return CommunicationUserTokenModel(token: CommunicationFrameworkHelper.token, expiresOn: nil, communicationUserId: CommunicationFrameworkHelper.id)
+            return CommunicationUserTokenModel(token: CommunicationFrameworkHelper.token, expiresOn: nil, communicationUserId: CommunicationFrameworkHelper.id, displayName: CommunicationFrameworkHelper.displayName)
         } else {
             return nil
         }
