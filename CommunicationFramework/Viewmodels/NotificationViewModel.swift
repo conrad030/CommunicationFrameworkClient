@@ -32,6 +32,7 @@ public class NotificationViewModel: NSObject, ObservableObject, UNUserNotificati
         super.init()
     }
 
+    // TODO: Hubname und connection URL auslagern. Muss von außen übergeben werden können.
     public func connectToHub() {
         let hubName = CommunicationFrameworkHelper.hubName
         let connectionString = CommunicationFrameworkHelper.hubConnectionUrl

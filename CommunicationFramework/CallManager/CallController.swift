@@ -50,6 +50,7 @@ public class CallController: NSObject {
         self.requestTransaction(muteCallAction, completionHandler: completionHandler)
     }
 
+    // TODO: Manchmal error beim Hangup... (The operation couldn’t be completed. (com.apple.CallKit.error.requesttransaction error 4.))
     /// Requests that the actions in the specified transaction be asynchronously performed by the telephony provider.
     /// - Parameters:
     ///   - action: CXAction

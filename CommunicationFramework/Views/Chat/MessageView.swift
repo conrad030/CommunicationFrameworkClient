@@ -10,6 +10,7 @@ import SwiftUI
 struct MessageView: View {
     
     @EnvironmentObject var chatViewModel: ChatViewModel
+    @EnvironmentObject var snackBarViewModel: SnackBarViewModel
     
     @ObservedObject var chatMessage: ChatMessage
     private var isOwnMessage: Bool {
@@ -120,7 +121,7 @@ struct MessageView: View {
                     Button(role: .destructive) {
                         self.chatViewModel.deleteMessageForAll(message: self.chatMessage) { success in
                             if !success {
-                                Snackbar.showMessageAlert(name: "Nachricht konnte nicht gelöscht werden.")
+                                self.snackBarViewModel.showMessage(message: "Nachricht konnte nicht gelöscht werden.")
                             }
                         }
                     } label: {

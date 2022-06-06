@@ -8,7 +8,7 @@
 import SwiftUI
 import AzureCommunicationCalling
 
-public class LocalVideoStreamModel: VideoStreamModel {
+public class AzureLocalVideoStreamModel: AzureVideoStreamModel {
     
     public func createView(localVideoStream: LocalVideoStream?) {
         do {

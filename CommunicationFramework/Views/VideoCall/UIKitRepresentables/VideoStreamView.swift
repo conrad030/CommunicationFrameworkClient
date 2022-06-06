@@ -6,17 +6,15 @@
 //
 
 import SwiftUI
-import AzureCommunicationCalling
 
 struct VideoStreamView: UIViewRepresentable {
     
-    public let view: RendererView
+    public let view: UIView
 
     func makeUIView(context: Context) -> UIView {
-        return view
+        self.view
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {
     }
 }
-

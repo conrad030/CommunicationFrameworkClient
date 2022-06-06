@@ -4,11 +4,14 @@
 //
 //  Created by Conrad Felgentreff on 21.04.22.
 //
+// TODO: Problem: CallingViewModel bekommt nicht mit, wenn VideoStreamModel sich ändert.
+// - Information muss irgendwie nach außen getragen werden
+// - Kann StreamView selber damit umgehen? Wenn View nicht mehr da ist, muss diese Disposed werden (updateUIViewRepresentable?)
 
 import SwiftUI
 import AzureCommunicationCalling
 
-public class RemoteVideoStreamModel: VideoStreamModel, RemoteParticipantDelegate {
+public class AzureRemoteVideoStreamModel: AzureVideoStreamModel, RemoteParticipantDelegate {
     
     @Published public var isRemoteVideoStreamEnabled:Bool = false
     @Published public var isMicrophoneMuted:Bool = false
@@ -23,6 +26,7 @@ public class RemoteVideoStreamModel: VideoStreamModel, RemoteParticipantDelegate
         self.remoteParticipant!.delegate = self
         self.isMicrophoneMuted = false
         self.isSpeaking = false
+        self.checkStream()
     }
 
     public func checkStream() {
@@ -48,13 +52,10 @@ public class RemoteVideoStreamModel: VideoStreamModel, RemoteParticipantDelegate
     private func removeStream(stream: RemoteVideoStream?) {
         if stream != nil {
             self.renderer?.dispose()
+            self.renderer = nil
             self.videoStreamView = nil
+            print("Removed remote VideoStreamView.")
         }
-    }
-
-    public func toggleScalingMode() {
-        self.scalingMode = self.scalingMode == .crop ? .fit : .crop
-        self.videoStreamView?.view.update(scalingMode: self.scalingMode)
     }
     
     public func remoteParticipant(_ remoteParticipant: RemoteParticipant, didChangeState args: PropertyChangedEventArgs) {

@@ -32,7 +32,7 @@ struct ContentView: View {
                     // TODO: Irgendwo muss man den Identifier herbekommen
                     // iPhone 12: 8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00ed-af4e-65f0-ad3a0d000130
                     // iPhone 6s: 8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0
-                    self.callingViewModel.startCall(calleeIdentifier: "8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0")
+                    self.callingViewModel.startCall(identifier: "8:acs:7d8a86e0-5ac4-4d37-a9dd-dabf0f99e29b_00000011-00b5-7de7-59fe-ad3a0d00fee0")
                 } label: {
                     
                     Text("Start call")
@@ -75,8 +75,8 @@ struct ContentView: View {
             }
             .navigationBarTitle("Communication Framework", displayMode: .inline)
         }
-        .onReceive(self.callingViewModel.$callState) {
-            self.presentCallView = $0 == .connected
+        .onReceive(self.callingViewModel.$presentCallView) {
+            self.presentCallView = $0
         }
         .onReceive(self.chatViewModel.$chatIsSetup) {
             if $0 {
@@ -94,5 +94,6 @@ struct ContentView_Previews: PreviewProvider {
         
         ContentView()
             .environmentObject(CallingViewModel.shared)
+            .environmentObject(ChatViewModel.shared)
     }
 }

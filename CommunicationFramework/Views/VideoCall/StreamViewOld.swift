@@ -2,20 +2,22 @@
 //  StreamView.swift
 //  CommunicationFramework
 //
-//  Created by Conrad Felgentreff on 02.06.22.
+//  Created by Conrad Felgentreff on 22.04.22.
 //
 
 import SwiftUI
+import AzureCommunicationCalling
 
-struct StreamView: View {
-    
-    @EnvironmentObject var callingViewModel: CallingViewModel
-    
+struct StreamViewOld: View {
+    @StateObject var remoteVideoStreamModel: AzureRemoteVideoStreamModel
+    @State var isMicrophoneMuted:Bool = false
+    @State var isSpeaking:Bool = false
+
     var body: some View {
         
         ZStack {
             
-            if let videoStreamView = self.callingViewModel.remoteVideoStreamModel?.videoStreamView {
+            if let videoStreamView = self.remoteVideoStreamModel.videoStreamView {
                 
                 videoStreamView
             } else {
@@ -36,11 +38,11 @@ struct StreamView: View {
                     
                     Spacer()
                     
-                    Text(self.callingViewModel.displayName ?? "Anonymus")
+                    Text(self.remoteVideoStreamModel.displayName)
                         .foregroundColor(.secondary)
                         .font(.subheadline)
                     
-                    Image(systemName: self.callingViewModel.isMuted ? "speaker.slash" : "speaker.wave.2")
+                    Image(systemName: self.isMicrophoneMuted ? "speaker.slash" : "speaker.wave.2")
                         .foregroundColor(.secondary)
                         .font(.subheadline)
                         .padding()
@@ -52,12 +54,20 @@ struct StreamView: View {
                 Spacer()
             }
         }
+//        .onTapGesture(count: 2) {
+//            self.remoteVideoStreamModel.toggleScalingMode()
+//        }
         .edgesIgnoringSafeArea(.all)
-    }
-}
-
-struct StreamView_Previews: PreviewProvider {
-    static var previews: some View {
-        StreamView()
+        .onReceive(self.remoteVideoStreamModel.$isMicrophoneMuted, perform: { isMicrophoneMuted in
+            self.isMicrophoneMuted = isMicrophoneMuted
+            print("isMicrophoneMuted: \(isMicrophoneMuted)")
+        })
+        .onReceive(self.remoteVideoStreamModel.$isSpeaking, perform: { isSpeaking in
+            self.isSpeaking = isSpeaking
+            print("isSpeaking: \(isSpeaking)")
+        })
+        .onAppear {
+            self.remoteVideoStreamModel.checkStream()
+        }
     }
 }

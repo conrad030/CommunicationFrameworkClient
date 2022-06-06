@@ -13,7 +13,21 @@ class ProviderDelegate: NSObject {
     
     public static let shared: ProviderDelegate = ProviderDelegate()
     private(set) var provider: CXProvider?
+    
+    // MARK: - Callback events
 
+    public var hasIncomingCall: ((UUID, String, Bool) -> Void)?
+
+    public var acceptCall: ((UUID) -> Void)?
+
+    public var endCall: ((UUID) -> Void)?
+
+    public var muteCall: ((UUID) -> Void)?
+
+    deinit {
+        provider?.invalidate()
+    }
+    
     public func configureProvider() {
         let configuration = CXProviderConfiguration()
         configuration.maximumCallGroups = 1
@@ -22,10 +36,6 @@ class ProviderDelegate: NSObject {
         configuration.iconTemplateImageData = UIImage(systemName: "video")?.pngData()
         provider = CXProvider(configuration: configuration)
         provider?.setDelegate(self, queue: DispatchQueue.main)
-    }
-
-    deinit {
-        provider?.invalidate()
     }
 
     // MARK: - Configure AudioSession
@@ -44,16 +54,6 @@ class ProviderDelegate: NSObject {
             print("Error configuring AVAudioSession: \(error.localizedDescription)")
         }
     }
-
-    // MARK: - Callback events
-
-    public var hasIncomingCall: ((UUID, String, Bool) -> Void)?
-
-    public var acceptCall: ((UUID) -> Void)?
-
-    public var endCall: ((UUID) -> Void)?
-
-    public var muteCall: ((UUID) -> Void)?
 
     // MARK: - Handle incoming call
 

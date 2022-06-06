@@ -44,7 +44,7 @@ class ChatViewModel: NSObject, ObservableObject {
         self.chatMessages = self.readData()
         self.chatModel.delegate = self
         /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected
-        if let observableObject = chatModel as? AzureChatModel {
+        if let observableObject = self.chatModel as? AzureChatModel {
             self.anyCancellable = observableObject.objectWillChange.sink { [weak self] _ in
                 self?.objectWillChange.send()
             }
@@ -64,6 +64,7 @@ class ChatViewModel: NSObject, ObservableObject {
     }
     
     public func initChatViewModel() {
+        // TODO: Werte können auch übergeben werden, statt statisch gesetzt zu werden
         if !CommunicationFrameworkHelper.endpoint.isEmpty && !CommunicationFrameworkHelper.token.isEmpty {
             do {
                 try self.chatModel.initChatModel(endpoint: CommunicationFrameworkHelper.endpoint, identifier: CommunicationFrameworkHelper.id, token: CommunicationFrameworkHelper.token)
@@ -72,7 +73,7 @@ class ChatViewModel: NSObject, ObservableObject {
             }
             self.startRealTimeNotifications()
         } else {
-            print("ChatClient couldn't be initialized. Credentials are missing.")
+            print("ChatModel couldn't be initialized. Credentials are missing.")
         }
     }
     

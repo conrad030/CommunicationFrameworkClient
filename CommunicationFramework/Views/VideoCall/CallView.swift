@@ -6,12 +6,11 @@
 //
 
 import SwiftUI
+import Combine
 
 struct CallView: View {
     
     @EnvironmentObject var callingViewModel: CallingViewModel
-
-    private var selectedAnchor: Alignment = .topLeading
     
     var body: some View {
         
@@ -19,9 +18,9 @@ struct CallView: View {
             
             ZStack {
                 
-                if !self.callingViewModel.remoteVideoStreamModels.isEmpty {
+                if self.callingViewModel.remoteVideoStreamModel?.videoStreamView != nil {
                     
-                    StreamView(remoteVideoStreamModel: self.callingViewModel.remoteVideoStreamModels.first!)
+                    StreamView()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: outerGeometry.size.width, height: outerGeometry.size.height)
                 } else {
@@ -33,9 +32,9 @@ struct CallView: View {
                     
                     GeometryReader { geometry in
                         
-                        if self.callingViewModel.localVideoStreamModel != nil {
+                        if let localVideoView = self.callingViewModel.localVideoStreamModel?.videoStreamView {
                             
-                            self.callingViewModel.localVideoStreamModel?.videoStreamView
+                            localVideoView
                                 .cornerRadius(16)
                                 .frame(width: geometry.size.width / 3, height: geometry.size.height / 3)
                                 .padding([.top, .leading], 30)
@@ -57,7 +56,7 @@ struct CallView: View {
                         } label: {
                             HStack {
                                 Spacer()
-                                if self.callingViewModel.isLocalVideoStreamEnabled {
+                                if self.callingViewModel.localVideoStreamModel?.videoStreamView != nil {
                                     Image(systemName: "video")
                                         .padding()
                                 } else {
@@ -76,7 +75,7 @@ struct CallView: View {
                                 
                                 Spacer()
                                 
-                                if self.callingViewModel.isMicrophoneMuted {
+                                if self.callingViewModel.isMuted {
                                     
                                     Image(systemName: "speaker.slash")
                                         .padding()

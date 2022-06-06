@@ -10,6 +10,7 @@ import SwiftUI
 struct ChatView: View {
     
     @EnvironmentObject var chatViewModel: ChatViewModel
+    @StateObject var snackBarViewModel = SnackBarViewModel()
     
     @State private var message = ""
     private var dates: [Date] {
@@ -159,6 +160,7 @@ struct ChatView: View {
             )
         }
         .background(Color(.white))
+        .snackBar(snackBarViewModel: self.snackBarViewModel)
         .confirmationDialog("", isPresented: self.$showActionSheet, titleVisibility: .hidden) {
             Button("Kamera") {
                 self.sourceType = .camera
@@ -199,6 +201,7 @@ struct ChatView: View {
             UIScrollView.appearance().keyboardDismissMode = .interactive
             self.chatViewModel.leaveChat()
         }
+        .environmentObject(self.snackBarViewModel)
     }
 }
 

@@ -8,7 +8,6 @@
 // MARK: To handle incoming push notifications
 
 import PushKit
-import AzureCommunicationCalling
 
 public class PushRegistryDelegate: NSObject {
     public static let shared: PushRegistryDelegate = PushRegistryDelegate()
@@ -38,23 +37,24 @@ extension PushRegistryDelegate: PKPushRegistryDelegate {
         print("dictionaryPayload: \(dictionaryPayload)\n")
 
         if type == .voIP {
-            let incomingCallPushNotification = PushNotificationInfo.fromDictionary(payload.dictionaryPayload)
-            // TODO: Anders an die Werte kommen, damit unabhängig von Azure
-            let callId = incomingCallPushNotification.callId
-            let handle = incomingCallPushNotification.fromDisplayName
-            let hasVideo = incomingCallPushNotification.incomingWithVideo
+            // TODO: Die Namen der Werte können hier wahrscheinlich variieren. Enum schreiben, welches die String Keys für die Werte von Azure beinhaltet und dann hier anwenden.
+            let outterDictionary = payload.dictionaryPayload as? [String: Any]
+            let dictionary = outterDictionary?["data"] as? [String: Any]
+            guard let callId = dictionary?["callId"] as? String else { print("String \"callId\" in dictionaryPayload not found or type is wrong."); return }
+            guard let handle = dictionary?["displayName"] as? String else { print("String \"displayName\" in dictionaryPayload not found or type is wrong."); return }
+            // TODO: Ist da, aber lässt sich nicht in Bool casten. Value ist true.
+            guard let hasVideoString = dictionary?["videoCall"] as? String else { print("String \"videoCall\" in dictionaryPayload not found or type is wrong."); return }
+            let hasVideo = hasVideoString == "true"
             
-            // Report incoming call to ProviderDelegate
-            ProviderDelegate.shared.reportNewIncomingCall(callId: callId, handle: handle, hasVideo: hasVideo) { error in
+            ProviderDelegate.shared.reportNewIncomingCall(callId: UUID(uuidString: callId)!, handle: handle, hasVideo: hasVideo) { error in
                 if let error = error {
                     print("reportNewIncomingCall failed: \(error.localizedDescription)\n")
                 } else {
-                    print("reportNewIncomingCall was succesful.\n")
+                    print("reportNewIncomingCall was successful.\n")
                 }
                 completion()
                 
-                // TODO: Direkt Payload übergeben, um unabhängig von Azure zu sein
-                CallingViewModel.shared.handlePushNotification(incomingCallPushNotification: incomingCallPushNotification)
+                CallingViewModel.shared.handlePushNotification(payload: payload)
             }
         }
     }
