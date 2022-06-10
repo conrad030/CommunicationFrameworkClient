@@ -15,7 +15,7 @@ class CallingViewModel: ObservableObject {
     /// The singleton instance of this class
     public static let shared: CallingViewModel = CallingViewModel()
     
-    @Published private var callingModel: CallingModel = AzureCallingModel()
+    @Published private var callingModel: CallingModel
     
     @Published public var displayName: String?
     public var localVideoStreamModel: VideoStreamModel? {
@@ -33,17 +33,33 @@ class CallingViewModel: ObservableObject {
     
     private var anyCancellable: AnyCancellable? = nil
     
+    struct Config {
+        var callingModel: CallingModel
+    }
+    
+    private static var config: Config?
+    
+    class func setup<Model: CallingModel & ObservableObject>(callingModel: Model) {
+        let config = Config(callingModel: callingModel)
+        CallingViewModel.config = config
+    }
+        
     private init() {
+        guard let config = CallingViewModel.config else {
+            fatalError("Error: You must call setup before accessing CallingViewModel.shared")
+        }
+        self.callingModel = config.callingModel
         self.callingModel.delegate = self
         _ = HapticsManager.shared
         _ = PushRegistryDelegate.shared
-        /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected
-        if let observableObject = self.callingModel as? AzureCallingModel {
-            self.anyCancellable = observableObject.objectWillChange.sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
-        }
         self.initProvider()
+    }
+    
+    public func linkModelToViewModel<Model: CallingModel & ObservableObject>(callingModel: Model) {
+        /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected
+        self.anyCancellable = callingModel.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
     }
     
     public func initCallingViewModel() {

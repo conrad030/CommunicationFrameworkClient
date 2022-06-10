@@ -86,6 +86,54 @@ struct ContentView: View {
                 }
             }
         }
+        .onAppear {
+            /// Get identifier and token from Server
+            let domain = getPlistInfo(resourceName: "Info", key: "DOMAIN")
+            let endpoint = getPlistInfo(resourceName: "Info", key: "ENDPOINT")
+            let query = getPlistInfo(resourceName: "Info", key: "QUERY")
+            
+            let defaults = UserDefaults.standard
+            var urlString = domain + endpoint
+            // If there is an existing identifier, refresh token instead of creating a new identity
+            if let identifier = defaults.string(forKey: "identifier") {
+                urlString += query + identifier
+            }
+            let url = URL(string: urlString)!
+            var request = URLRequest(url: url)
+            request.setValue(getPlistInfo(resourceName: "Info", key: "API_KEY"), forHTTPHeaderField: "API-Key")
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                if let error = error {
+                    print("Error with fetching credentials: \(error)")
+                    return
+                }
+                
+                guard let httpResponse = response as? HTTPURLResponse,
+                      (200...299).contains(httpResponse.statusCode) else {
+                    print("Error with the response, unexpected status code: \(String(describing: response))")
+                    return
+                }
+                
+                if let data = data {
+                    do {
+                        guard let credentials = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else { return print("Couldn't decode credentials from data") }
+                        let displayName = "Conrad"
+                        let token = credentials["token"]!
+                        let identifier = credentials["identifier"]!
+                        // Store identifier in user defaults
+                        defaults.set(identifier, forKey: "identifier")
+                        /// Init user token credentials
+                        CommunicationFrameworkHelper.initUserTokenCredentials(displayName: displayName, token: token, id: identifier)
+                        DispatchQueue.main.async {
+                            self.callingViewModel.initCallingViewModel()
+                            self.chatViewModel.initChatViewModel()
+                        }
+                    } catch {
+                        print("There was an error while trying to decode credentials: \(error.localizedDescription)")
+                    }
+                }
+            }
+            task.resume()
+        }
     }
 }
 
@@ -94,6 +142,6 @@ struct ContentView_Previews: PreviewProvider {
         
         ContentView()
             .environmentObject(CallingViewModel.shared)
-            .environmentObject(ChatViewModel.shared)
+            .environmentObject(ChatViewModel(chatModel: AzureChatModel()))
     }
 }

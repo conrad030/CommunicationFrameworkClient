@@ -13,10 +13,7 @@ import CoreData
 
 class ChatViewModel: NSObject, ObservableObject {
     
-    /// The singleton instance of the Viewmodel
-    public static let shared: ChatViewModel = ChatViewModel()
-    
-    @Published private var chatModel: ChatModel = AzureChatModel()
+    @Published private var chatModel: ChatModel
     private var anyCancellable: AnyCancellable? = nil
     
     private var fileStorageModel: FileStorage = AmplifyFileStorage()
@@ -39,15 +36,18 @@ class ChatViewModel: NSObject, ObservableObject {
         !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty
     }
     
-    override private init() {
+    struct Config {
+        var chatModel: ChatModel
+    }
+    
+    init<Model: ChatModel & ObservableObject>(chatModel: Model) {
+        self.chatModel = chatModel
         super.init()
         self.chatMessages = self.readData()
         self.chatModel.delegate = self
         /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected
-        if let observableObject = self.chatModel as? AzureChatModel {
-            self.anyCancellable = observableObject.objectWillChange.sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
+        self.anyCancellable = chatModel.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
         }
     }
     

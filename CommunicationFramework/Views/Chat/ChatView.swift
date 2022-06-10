@@ -208,6 +208,6 @@ struct ChatView: View {
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
         ChatView()
-            .environmentObject(ChatViewModel.shared)
+            .environmentObject(ChatViewModel(chatModel: AzureChatModel()))
     }
 }
