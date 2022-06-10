@@ -36,10 +36,6 @@ class ChatViewModel: NSObject, ObservableObject {
         !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty
     }
     
-    struct Config {
-        var chatModel: ChatModel
-    }
-    
     init<Model: ChatModel & ObservableObject>(chatModel: Model) {
         self.chatModel = chatModel
         super.init()
