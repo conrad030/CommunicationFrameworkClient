@@ -44,7 +44,6 @@
 		7A644009285A20C7006E2EC7 /* TestAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A644008285A20C7006E2EC7 /* TestAssets.xcassets */; };
 		7A654A75284A5122002EA80D /* VideoStreamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A654A74284A5122002EA80D /* VideoStreamModel.swift */; };
 		7A6668A62816A51D003E16A6 /* PLHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6668A52816A51D003E16A6 /* PLHelper.swift */; };
-		7A6668A82816B184003E16A6 /* NotificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6668A72816B184003E16A6 /* NotificationViewModel.swift */; };
 		7A73F43A283BEF4D0030BBE7 /* ChatMessageStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A73F439283BEF4D0030BBE7 /* ChatMessageStatus.swift */; };
 		7A74C30B28328E7C00E12FCD /* ChatStore.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7A74C30928328E7C00E12FCD /* ChatStore.xcdatamodeld */; };
 		7A8786182853699100CCB700 /* CallingViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A8786172853699100CCB700 /* CallingViewModelTests.swift */; };
@@ -139,7 +138,6 @@
 		7A644008285A20C7006E2EC7 /* TestAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = TestAssets.xcassets; sourceTree = "<group>"; };
 		7A654A74284A5122002EA80D /* VideoStreamModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoStreamModel.swift; sourceTree = "<group>"; };
 		7A6668A52816A51D003E16A6 /* PLHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLHelper.swift; sourceTree = "<group>"; };
-		7A6668A72816B184003E16A6 /* NotificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModel.swift; sourceTree = "<group>"; };
 		7A73F439283BEF4D0030BBE7 /* ChatMessageStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessageStatus.swift; sourceTree = "<group>"; };
 		7A74C30A28328E7C00E12FCD /* ChatStore.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ChatStore.xcdatamodel; sourceTree = "<group>"; };
 		7A7E48C82819487000E74614 /* Trouter.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = Trouter.xcframework; path = Pods/Trouter/Trouter.xcframework; sourceTree = "<group>"; };
@@ -398,7 +396,6 @@
 		7AE015D52811AFD7004A195B /* Viewmodels */ = {
 			isa = PBXGroup;
 			children = (
-				7A6668A72816B184003E16A6 /* NotificationViewModel.swift */,
 				7A382933281936E1000ABAB9 /* ChatViewModel.swift */,
 				7A00B9E028476EC300E268F8 /* CallingViewModel.swift */,
 				7A1F2587284E538C00E466DA /* SnackBarViewModel.swift */,
@@ -787,7 +784,6 @@
 				7A00B9E628476F4A00E268F8 /* CallingModel.swift in Sources */,
 				7A654A75284A5122002EA80D /* VideoStreamModel.swift in Sources */,
 				7A48B9B12841232900EBDFE4 /* ChatModelDelegate.swift in Sources */,
-				7A6668A82816B184003E16A6 /* NotificationViewModel.swift in Sources */,
 				7A74C30B28328E7C00E12FCD /* ChatStore.xcdatamodeld in Sources */,
 				7A22A9B5282406E3008C7124 /* UIImage.swift in Sources */,
 				7A62D2F22822BB28001D1C80 /* AmplifyFileStorage.swift in Sources */,

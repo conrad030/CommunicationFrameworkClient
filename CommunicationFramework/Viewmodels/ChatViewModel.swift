@@ -44,6 +44,7 @@ class ChatViewModel: NSObject, ObservableObject {
         self.anyCancellable = chatModel.objectWillChange.sink { [weak self] _ in
             self?.objectWillChange.send()
         }
+        _ = HapticsManager.shared
     }
     
     private func readData() -> [ChatMessage] {

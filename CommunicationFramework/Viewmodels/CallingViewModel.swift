@@ -50,9 +50,9 @@ class CallingViewModel: ObservableObject {
         }
         self.callingModel = config.callingModel
         self.callingModel.delegate = self
-        _ = HapticsManager.shared
         _ = PushRegistryDelegate.shared
         self.initProvider()
+        self.requestAudioAndVideoPermission { _ in }
     }
     
     public func linkModelToViewModel<Model: CallingModel & ObservableObject>(callingModel: Model) {
@@ -66,8 +66,7 @@ class CallingViewModel: ObservableObject {
         if !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.token.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty {
             self.displayName = CommunicationFrameworkHelper.displayName
             self.callingModel.initCallingModel(identifier: CommunicationFrameworkHelper.id, token: CommunicationFrameworkHelper.token, displayName: CommunicationFrameworkHelper.displayName) {
-                // TODO: Idee: Nicht mehr Singleton und Property in CallingViewModel speichern
-                NotificationViewModel.shared.connectToHub()
+                print("CallingModel initialized.")
             }
         } else {
             print("CallingModel couldn't be initialized. Credentials are missing.")
@@ -137,9 +136,9 @@ class CallingViewModel: ObservableObject {
     
     private func initProvider() {
         ProviderDelegate.shared.acceptCall = { callId in
-            self.requestAudioPermission { authorized in
+            self.requestAudioAndVideoPermission { authorized in
                 if !authorized {
-                    print("recordPermission not authorized.")
+                    print("Record permissions not denied.")
                     return
                 }
                 self.callingModel.acceptIncomingCall(callId: callId)
@@ -158,6 +157,17 @@ class CallingViewModel: ObservableObject {
     
     // MARK: - Permission management.
 
+    private func requestAudioAndVideoPermission(completion: @escaping (Bool) -> Void) {
+        self.requestAudioPermission { authorized in
+            if !authorized {
+                return completion(false)
+            } else {
+                self.requestVideoPermission { authorized in
+                    return completion(authorized)
+                }
+            }
+        }
+    }
     /// Request for audio permission
     private func requestAudioPermission(completion: @escaping (Bool) -> Void) {
         let audioSession = AVAudioSession.sharedInstance()
