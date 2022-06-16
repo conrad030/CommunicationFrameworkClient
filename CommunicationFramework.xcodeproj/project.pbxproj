@@ -41,6 +41,7 @@
 		7A62D2EE2822ABCC001D1C80 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A62D2ED2822ABCC001D1C80 /* ImagePicker.swift */; };
 		7A62D2F02822AF0E001D1C80 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A62D2EF2822AF0E001D1C80 /* HapticsManager.swift */; };
 		7A62D2F22822BB28001D1C80 /* AmplifyFileStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A62D2F12822BB28001D1C80 /* AmplifyFileStorage.swift */; };
+		7A644009285A20C7006E2EC7 /* TestAssets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7A644008285A20C7006E2EC7 /* TestAssets.xcassets */; };
 		7A654A75284A5122002EA80D /* VideoStreamModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A654A74284A5122002EA80D /* VideoStreamModel.swift */; };
 		7A6668A62816A51D003E16A6 /* PLHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6668A52816A51D003E16A6 /* PLHelper.swift */; };
 		7A6668A82816B184003E16A6 /* NotificationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A6668A72816B184003E16A6 /* NotificationViewModel.swift */; };
@@ -51,6 +52,7 @@
 		7A87861D285382D000CCB700 /* MockChatModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A87861C285382D000CCB700 /* MockChatModel.swift */; };
 		7A8A865928199E8D00E86A64 /* Pods_CommunicationFramework.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1132CF220F1A602D76135BF4 /* Pods_CommunicationFramework.framework */; };
 		7AB220FD2829581700070312 /* PDFFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB220FC2829581700070312 /* PDFFile.swift */; };
+		7AB4D5012853B5F2009887B8 /* TestCoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AB4D5002853B5F2009887B8 /* TestCoreDataStack.swift */; };
 		7ACCEFCF2812B20E0076746C /* CallController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFCE2812B20E0076746C /* CallController.swift */; };
 		7ACCEFD12812B2FF0076746C /* StreamViewOld.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFD02812B2FF0076746C /* StreamViewOld.swift */; };
 		7ACCEFD32812B6200076746C /* PushRegistryDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ACCEFD22812B6200076746C /* PushRegistryDelegate.swift */; };
@@ -134,6 +136,7 @@
 		7A62D2ED2822ABCC001D1C80 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
 		7A62D2EF2822AF0E001D1C80 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
 		7A62D2F12822BB28001D1C80 /* AmplifyFileStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmplifyFileStorage.swift; sourceTree = "<group>"; };
+		7A644008285A20C7006E2EC7 /* TestAssets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = TestAssets.xcassets; sourceTree = "<group>"; };
 		7A654A74284A5122002EA80D /* VideoStreamModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoStreamModel.swift; sourceTree = "<group>"; };
 		7A6668A52816A51D003E16A6 /* PLHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PLHelper.swift; sourceTree = "<group>"; };
 		7A6668A72816B184003E16A6 /* NotificationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewModel.swift; sourceTree = "<group>"; };
@@ -144,6 +147,7 @@
 		7A87861928536A0A00CCB700 /* ChatViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewModelTests.swift; sourceTree = "<group>"; };
 		7A87861C285382D000CCB700 /* MockChatModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockChatModel.swift; sourceTree = "<group>"; };
 		7AB220FC2829581700070312 /* PDFFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFFile.swift; sourceTree = "<group>"; };
+		7AB4D5002853B5F2009887B8 /* TestCoreDataStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestCoreDataStack.swift; sourceTree = "<group>"; };
 		7ACCEFCE2812B20E0076746C /* CallController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallController.swift; sourceTree = "<group>"; };
 		7ACCEFD02812B2FF0076746C /* StreamViewOld.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamViewOld.swift; sourceTree = "<group>"; };
 		7ACCEFD22812B6200076746C /* PushRegistryDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushRegistryDelegate.swift; sourceTree = "<group>"; };
@@ -315,6 +319,7 @@
 			isa = PBXGroup;
 			children = (
 				7A87861C285382D000CCB700 /* MockChatModel.swift */,
+				7AB4D5002853B5F2009887B8 /* TestCoreDataStack.swift */,
 			);
 			path = Chat;
 			sourceTree = "<group>";
@@ -376,6 +381,7 @@
 				7A87861928536A0A00CCB700 /* ChatViewModelTests.swift */,
 				7A8786172853699100CCB700 /* CallingViewModelTests.swift */,
 				7AE015BC2811AF68004A195B /* CommunicationFrameworkTests.swift */,
+				7A644008285A20C7006E2EC7 /* TestAssets.xcassets */,
 			);
 			path = CommunicationFrameworkTests;
 			sourceTree = "<group>";
@@ -641,6 +647,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A644009285A20C7006E2EC7 /* TestAssets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -827,6 +834,7 @@
 				7A87861D285382D000CCB700 /* MockChatModel.swift in Sources */,
 				7A87861A28536A0A00CCB700 /* ChatViewModelTests.swift in Sources */,
 				7A8786182853699100CCB700 /* CallingViewModelTests.swift in Sources */,
+				7AB4D5012853B5F2009887B8 /* TestCoreDataStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

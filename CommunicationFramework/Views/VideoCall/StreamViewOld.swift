@@ -54,9 +54,6 @@ struct StreamViewOld: View {
                 Spacer()
             }
         }
-//        .onTapGesture(count: 2) {
-//            self.remoteVideoStreamModel.toggleScalingMode()
-//        }
         .edgesIgnoringSafeArea(.all)
         .onReceive(self.remoteVideoStreamModel.$isMicrophoneMuted, perform: { isMicrophoneMuted in
             self.isMicrophoneMuted = isMicrophoneMuted
@@ -66,8 +63,5 @@ struct StreamViewOld: View {
             self.isSpeaking = isSpeaking
             print("isSpeaking: \(isSpeaking)")
         })
-        .onAppear {
-            self.remoteVideoStreamModel.checkStream()
-        }
     }
 }

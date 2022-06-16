@@ -33,16 +33,12 @@ extension PushRegistryDelegate: PKPushRegistryDelegate {
     }
 
     public func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        let dictionaryPayload = payload.dictionaryPayload
-        print("dictionaryPayload: \(dictionaryPayload)\n")
-
         if type == .voIP {
             // TODO: Die Namen der Werte können hier wahrscheinlich variieren. Enum schreiben, welches die String Keys für die Werte von Azure beinhaltet und dann hier anwenden.
             let outterDictionary = payload.dictionaryPayload as? [String: Any]
             let dictionary = outterDictionary?["data"] as? [String: Any]
             guard let callId = dictionary?["callId"] as? String else { print("String \"callId\" in dictionaryPayload not found or type is wrong."); return }
             guard let handle = dictionary?["displayName"] as? String else { print("String \"displayName\" in dictionaryPayload not found or type is wrong."); return }
-            // TODO: Ist da, aber lässt sich nicht in Bool casten. Value ist true.
             guard let hasVideoString = dictionary?["videoCall"] as? String else { print("String \"videoCall\" in dictionaryPayload not found or type is wrong."); return }
             let hasVideo = hasVideoString == "true"
             

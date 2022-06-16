@@ -7,8 +7,6 @@
 
 // MARK: Viewmodel for managing calls. Singleton, so the object can be accessed in other classes
 
-import SwiftUI
-import AVFoundation
 import AzureCommunicationCalling
 import CallKit
 import PushKit
@@ -324,7 +322,7 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
                     call.accept(options: acceptCallOptions) { call, error in
                         if error == nil {
                             print("Incoming call accepted")
-                            self.azureLocalVideoStreamModel?.createView(localVideoStream: localVideoStreams.first!)
+                            self.azureLocalVideoStreamModel?.createView(localVideoStream: localVideoStreams.first)
                             self.delegate?.toggleVideoSucceeded(with: true)
                         } else {
                             print("Failed to accept incoming call")
@@ -347,6 +345,8 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
     public func endCall(callId: UUID) {
         print("EndCall requested from CallKit.\n")
         if let call = self.getCall(callId: callId) {
+            // TODO: Completion wird garnicht aufgerufen...
+            print("endCall in AzureCallingModel")
             call.hangUp(options: HangUpOptions()) { error in
                 if let error = error {
                     print("Hangup failed: \(error.localizedDescription).\n")

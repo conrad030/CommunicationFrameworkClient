@@ -38,7 +38,7 @@ public class NotificationViewModel: NSObject, ObservableObject, UNUserNotificati
         let connectionString = CommunicationFrameworkHelper.hubConnectionUrl
         
         if !connectionString.isEmpty && !hubName.isEmpty {
-            UNUserNotificationCenter.current().delegate = self;
+            UNUserNotificationCenter.current().delegate = self
             MSNotificationHub.setLifecycleDelegate(self)
             MSNotificationHub.setDelegate(self)
             MSNotificationHub.start(connectionString: connectionString, hubName: hubName)

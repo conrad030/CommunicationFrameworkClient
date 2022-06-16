@@ -18,9 +18,7 @@ class ChatViewModel: NSObject, ObservableObject {
     
     private var fileStorageModel: FileStorage = AmplifyFileStorage()
     
-    private var context: NSManagedObjectContext {
-        AppDelegate.instance!.persistentContainer.viewContext
-    }
+    private var context: NSManagedObjectContext
     @Published public var chatMessages: [ChatMessage] = [] {
         didSet {
             self.setFileDataForMessages()
@@ -36,8 +34,9 @@ class ChatViewModel: NSObject, ObservableObject {
         !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty
     }
     
-    init<Model: ChatModel & ObservableObject>(chatModel: Model) {
+    init<Model: ChatModel & ObservableObject>(chatModel: Model, context: NSManagedObjectContext = AppDelegate.instance!.persistentContainer.viewContext) {
         self.chatModel = chatModel
+        self.context = context
         super.init()
         self.chatMessages = self.readData()
         self.chatModel.delegate = self
