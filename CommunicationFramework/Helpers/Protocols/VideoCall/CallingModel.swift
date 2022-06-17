@@ -13,7 +13,7 @@ protocol CallingModel {
     var localVideoStreamModel: VideoStreamModel? { get }
     var remoteVideoStreamModel: VideoStreamModel? { get }
     var voipToken: Data? { get set }
-    func initCallingModel(identifier: String, token: String, displayName: String, completion: @escaping () -> Void)
+    func initCallingModel(identifier: String, token: String, displayName: String)
     func registerPushNotifications(voipToken: Data)
     func acceptIncomingCall(callId: UUID)
     func endCall(callId: UUID)

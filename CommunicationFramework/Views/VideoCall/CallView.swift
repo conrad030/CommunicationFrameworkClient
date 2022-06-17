@@ -18,9 +18,9 @@ struct CallView: View {
             
             ZStack {
                 
-                if self.callingViewModel.remoteVideoStreamModel?.videoStreamView != nil {
+                if let videoStreamModel = self.callingViewModel.remoteVideoStreamModel {
                     
-                    StreamView()
+                    StreamView(videoStreamModel: videoStreamModel)
                         .aspectRatio(contentMode: .fill)
                         .frame(width: outerGeometry.size.width, height: outerGeometry.size.height)
                 } else {

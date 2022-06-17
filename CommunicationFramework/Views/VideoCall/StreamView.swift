@@ -9,13 +9,13 @@ import SwiftUI
 
 struct StreamView: View {
     
-    @EnvironmentObject var callingViewModel: CallingViewModel
+    @ObservedObject var videoStreamModel: VideoStreamModel
     
     var body: some View {
         
         ZStack {
             
-            if let videoStreamView = self.callingViewModel.remoteVideoStreamModel?.videoStreamView {
+            if let videoStreamView = self.videoStreamModel.videoStreamView {
                 
                 videoStreamView
             } else {
@@ -26,7 +26,7 @@ struct StreamView: View {
                     .foregroundColor(.black)
                     .edgesIgnoringSafeArea(.all)
                 
-                Text("Initializing video...")
+                Text("Video is disabled")
                     .foregroundColor(.white)
             }
             
@@ -36,11 +36,11 @@ struct StreamView: View {
                     
                     Spacer()
                     
-                    Text(self.callingViewModel.displayName ?? "Anonymus")
+                    Text(self.videoStreamModel.displayName)
                         .foregroundColor(.secondary)
                         .font(.subheadline)
                     
-                    Image(systemName: self.callingViewModel.isMuted ? "speaker.slash" : "speaker.wave.2")
+                    Image(systemName: "speaker.wave.2")
                         .foregroundColor(.secondary)
                         .font(.subheadline)
                         .padding()
@@ -56,8 +56,8 @@ struct StreamView: View {
     }
 }
 
-struct StreamView_Previews: PreviewProvider {
-    static var previews: some View {
-        StreamView()
-    }
-}
+//struct StreamView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        StreamView()
+//    }
+//}

@@ -35,8 +35,6 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
     public var localVideoStreamModel: VideoStreamModel? {
         self.azureLocalVideoStreamModel
     }
-//    @Published public var remoteVideoStreamModels: [AzureRemoteVideoStreamModel] = []
-    // TODO: Wahrscheinlich wird nicht detected wenn RemoteVideoStreamModel sich ändert
     @Published private var azureRemoteVideoStreamModel: AzureRemoteVideoStreamModel?
     public var remoteVideoStreamModel: VideoStreamModel? {
         self.azureRemoteVideoStreamModel
@@ -68,18 +66,14 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
     
     private var hasIncomingCall: ((Bool) -> Void)?
     
-    public func initCallingModel(identifier: String, token: String, displayName: String, completion: @escaping () -> Void) {
+    public func initCallingModel(identifier: String, token: String, displayName: String) {
         if !self.hasCallAgent {
             self.communicationUserToken = CommunicationUserTokenModel(token: token, expiresOn: nil, communicationUserId: identifier, displayName: displayName)
             self.initCallAgent(communicationUserTokenModel: self.communicationUserToken!) { success in
-                if success {
-                    completion()
-                } else {
+                if !success {
                     print("callAgent not intialized.\n")
                 }
             }
-        } else {
-            completion()
         }
     }
     

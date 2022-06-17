@@ -65,9 +65,7 @@ class CallingViewModel: ObservableObject {
     public func initCallingViewModel() {
         if !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.token.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty {
             self.displayName = CommunicationFrameworkHelper.displayName
-            self.callingModel.initCallingModel(identifier: CommunicationFrameworkHelper.id, token: CommunicationFrameworkHelper.token, displayName: CommunicationFrameworkHelper.displayName) {
-                print("CallingModel initialized.")
-            }
+            self.callingModel.initCallingModel(identifier: CommunicationFrameworkHelper.id, token: CommunicationFrameworkHelper.token, displayName: CommunicationFrameworkHelper.displayName)
         } else {
             print("CallingModel couldn't be initialized. Credentials are missing.")
         }
