@@ -9,8 +9,11 @@ import SwiftUI
 
 protocol CallingModelDelegate {
     func pushNotificationsRegistered()
+    func muteCall(callId: UUID, mute: Bool)
     func toggleMuteSucceeded(with mute: Bool)
     func toggleVideoSucceeded(with videoOn: Bool)
-    func onCallStarted()
-    func onCallEnded()
+    func startCall(callId: UUID)
+    func endCall(callId: UUID)
+    func onCallStarted(callId: UUID)
+    func onCallEnded(callId: UUID)
 }

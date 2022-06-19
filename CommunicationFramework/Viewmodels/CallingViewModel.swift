@@ -8,6 +8,7 @@
 import SwiftUI
 import Combine
 import PushKit
+import CallKit
 import AVFoundation
 
 class CallingViewModel: ObservableObject {
@@ -220,6 +221,19 @@ extension CallingViewModel: CallingModelDelegate {
         self.enableCallButton = true
     }
     
+    public func muteCall(callId: UUID, mute: Bool) {
+        CallController.shared.setMutedCall(callId: callId, muted: mute) { error in
+            if let error = error {
+                print("Failed to setMutedCall: \(error.localizedDescription)\n")
+            } else {
+                print("setMutedCall \(mute) successfully.\n")
+                DispatchQueue.main.async {
+                    self.isMuted = mute
+                }
+            }
+        }
+    }
+    
     public func toggleMuteSucceeded(with mute: Bool) {
         self.isMuted = mute
     }
@@ -228,11 +242,37 @@ extension CallingViewModel: CallingModelDelegate {
         self.localeVideoIsOn = videoOn
     }
     
-    public func onCallStarted() {
+    public func startCall(callId: UUID) {
+        CallController.shared.startCall(callId: callId, handle: self.displayName ?? "Anonymous", isVideo: true) { error in
+            if let error = error {
+                print("Outgoing call failed: \(error.localizedDescription)")
+            } else {
+                print("outgoing call started.")
+            }
+        }
+    }
+    
+    public func endCall(callId: UUID) {
+        CallController.shared.endCall(callId: callId) { error in
+            if let error = error {
+                print("EndCall request failed: \(error.localizedDescription)\n")
+            } else {
+                print("EndCall request succeeded.\n")
+                DispatchQueue.main.async {
+                    self.presentCallView = false
+                }
+            }
+        }
+    }
+    
+    public func onCallStarted(callId: UUID) {
+        ProviderDelegate.shared.startedConnectingAt(callId: callId)
+        ProviderDelegate.shared.connectedAt(callId: callId)
         self.presentCallView = true
     }
     
-    public func onCallEnded() {
+    public func onCallEnded(callId: UUID) {
+        ProviderDelegate.shared.reportCallEnded(callId: callId, reason: CXCallEndedReason.remoteEnded)
         self.presentCallView = false
     }
 }

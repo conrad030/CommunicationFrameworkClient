@@ -8,7 +8,6 @@
 // MARK: Viewmodel for managing calls. Singleton, so the object can be accessed in other classes
 
 import AzureCommunicationCalling
-import CallKit
 import PushKit
 
 // TODO: Muss AzureCallingModel eine Class sein oder kann Struct funktionieren? (Gibt es @escaping callbacks?)
@@ -24,13 +23,7 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
     public var voipToken: Data?
     private var localVideoStreams: [LocalVideoStream]?
     
-    @Published public var callState: CallState = CallState.none {
-        didSet {
-            if self.callState == .connected {
-                self.delegate?.onCallStarted()
-            }
-        }
-    }
+    @Published public var callState: CallState = CallState.none
     @Published private var azureLocalVideoStreamModel: AzureLocalVideoStreamModel?
     public var localVideoStreamModel: VideoStreamModel? {
         self.azureLocalVideoStreamModel
@@ -47,14 +40,6 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
     @Published public var enableCallButton: Bool = false
     
     private var communicationUserToken: CommunicationUserTokenModel?
-    
-    private var communicationUserTokenOld: CommunicationUserTokenModel? {
-        if CommunicationFrameworkHelper.credentialsExist {
-            return CommunicationUserTokenModel(token: CommunicationFrameworkHelper.token, expiresOn: nil, communicationUserId: CommunicationFrameworkHelper.id, displayName: CommunicationFrameworkHelper.displayName)
-        } else {
-            return nil
-        }
-    }
     
     public var hasCallAgent: Bool {
         self.callAgent != nil
@@ -216,29 +201,14 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
             }
             
             let callId = UUID(uuidString: (self.call?.id)!)
-            CallController.shared.startCall(callId: callId!, handle: CommunicationFrameworkHelper.displayName, isVideo: true) { error in
-                if let error = error {
-                    print("Outgoing call failed: \(error.localizedDescription)")
-                } else {
-                    print("outgoing call started.")
-                }
-            }
+            self.delegate?.startCall(callId: callId!)
         }
     }
     
     /// Stops a call
     public func endCall() {
         if let call = self.call, let callUUID = UUID(uuidString: call.id) {
-            CallController.shared.endCall(callId: callUUID) { error in
-                if let error = error {
-                    print("EndCall request failed: \(error.localizedDescription)\n")
-                } else {
-                    print("EndCall request succeeded.\n")
-                    DispatchQueue.main.async {
-                        self.delegate?.onCallEnded()
-                    }
-                }
-            }
+            self.delegate?.endCall(callId: callUUID)
         }
     }
     
@@ -254,16 +224,7 @@ public class AzureCallingModel: NSObject, ObservableObject, CallingModel {
     
     private func setMute(to mute: Bool) {
         if let call = self.call, let callUUID = UUID(uuidString: call.id) {
-            CallController.shared.setMutedCall(callId: callUUID, muted: mute) { error in
-                if let error = error {
-                    print("Failed to setMutedCall: \(error.localizedDescription)\n")
-                } else {
-                    print("setMutedCall \(mute) successfully.\n")
-                    DispatchQueue.main.async {
-                        self.delegate?.toggleMuteSucceeded(with: mute)
-                    }
-                }
-            }
+            self.delegate?.muteCall(callId: callUUID, mute: mute)
         }
     }
     
@@ -444,11 +405,11 @@ extension AzureCallingModel: CallAgentDelegate {
             self.call?.delegate = nil
             self.call = nil
             
-            ProviderDelegate.shared.reportCallEnded(callId: removedCallUUID, reason: CXCallEndedReason.remoteEnded)
+            self.delegate?.onCallEnded(callId: removedCallUUID)
         } else {
             print("removedCall: \(String(describing: args.removedCalls))")
             if let incomingCallPushNotification = self.incomingCallPushNotification {
-                ProviderDelegate.shared.reportCallEnded(callId: incomingCallPushNotification.callId, reason: CXCallEndedReason.remoteEnded)
+                self.delegate?.onCallEnded(callId: incomingCallPushNotification.callId)
             }
         }
     }
@@ -475,8 +436,7 @@ extension AzureCallingModel: CallDelegate {
         
         if call.state == .connected {
             if let callUUID = UUID(uuidString: call.id) {
-                ProviderDelegate.shared.startedConnectingAt(callId: callUUID)
-                ProviderDelegate.shared.connectedAt(callId: callUUID)
+                self.delegate?.onCallStarted(callId: callUUID)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     self.azureRemoteVideoStreamModel = AzureRemoteVideoStreamModel(identifier: call.id, displayName: call.callerInfo.displayName, remoteParticipant: call.remoteParticipants[0])
                 }
