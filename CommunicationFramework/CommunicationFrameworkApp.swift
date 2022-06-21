@@ -12,8 +12,6 @@ import SwiftUI
 @main
 struct CommunicationFrameworkApp: App {
     
-    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    
     @StateObject private var callingViewModel: CallingViewModel = CallingViewModel.shared
     @StateObject private var chatViewModel: ChatViewModel = ChatViewModel(chatModel: AzureChatModel())
     

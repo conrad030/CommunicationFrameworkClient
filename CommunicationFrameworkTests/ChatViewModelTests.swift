@@ -12,32 +12,27 @@ import CoreData
 class ChatViewModelTests: XCTestCase {
     
     var sut: ChatViewModel!
-    lazy var context: NSManagedObjectContext = {
-        self.getTestContainer().newBackgroundContext()
+    lazy var testContainer: NSPersistentContainer = {
+        let container = NSPersistentContainer(name: "ChatStore")
+        container.persistentStoreDescriptions[0].url = URL(fileURLWithPath: "/dev/null")
+        container.loadPersistentStores { description, error in
+            XCTAssertNil(error)
+        }
+        return container
     }()
+    var context: NSManagedObjectContext {
+        self.testContainer.newBackgroundContext()
+    }
     var senderIdentifier = UUID().uuidString
     
     override func setUpWithError() throws {
         try super.setUpWithError()
-        self.sut = ChatViewModel(chatModel: MockChatModel(), context: self.context)
+        self.sut = ChatViewModel(chatModel: MockChatModel(), container: self.testContainer)
     }
     
     override func tearDownWithError() throws {
         self.sut = nil
         try super.tearDownWithError()
-    }
-    
-    private func getTestContainer() -> NSPersistentContainer {
-        let description = NSPersistentStoreDescription()
-        description.url = URL(fileURLWithPath: "/dev/null")
-        let container = NSPersistentContainer(name: "ChatStore")
-        container.persistentStoreDescriptions = [description]
-        container.loadPersistentStores { description, error in
-            if let error = error {
-                fatalError("Unable to load persistent stores: \(error)")
-            }
-        }
-        return container
     }
     
     private func getNewChatMessage(withPdfFile: Bool = false) -> ChatMessage {

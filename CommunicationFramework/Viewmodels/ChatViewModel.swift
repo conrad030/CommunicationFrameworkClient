@@ -18,7 +18,10 @@ class ChatViewModel: NSObject, ObservableObject {
     
     private var fileStorageModel: FileStorage = AmplifyFileStorage()
     
-    private var context: NSManagedObjectContext
+    private var container: NSPersistentContainer
+    private var context: NSManagedObjectContext {
+        self.container.viewContext
+    }
     @Published public var chatMessages: [ChatMessage] = [] {
         didSet {
             self.setFileDataForMessages()
@@ -34,10 +37,15 @@ class ChatViewModel: NSObject, ObservableObject {
         !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty
     }
     
-    init<Model: ChatModel & ObservableObject>(chatModel: Model, context: NSManagedObjectContext = AppDelegate.instance!.persistentContainer.viewContext) {
+    init<Model: ChatModel & ObservableObject>(chatModel: Model, container: NSPersistentContainer = NSPersistentContainer(name: "ChatStore")) {
         self.chatModel = chatModel
-        self.context = context
+        self.container = container
         super.init()
+        self.container.loadPersistentStores { description, error in
+            if let error = error {
+                print("Core Data failed to load: \(error.localizedDescription)")
+            }
+        }
         self.chatMessages = self.readData()
         self.chatModel.delegate = self
         /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected
@@ -54,7 +62,7 @@ class ChatViewModel: NSObject, ObservableObject {
             let messages = try self.context.fetch(fetchRequest)
             return messages
         } catch let error as NSError {
-            print("Error fetching ProgrammingLanguages: \(error.localizedDescription), \(error.userInfo)")
+            print("Error fetching chat messages: \(error.localizedDescription), \(error.userInfo)")
             return []
         }
     }
