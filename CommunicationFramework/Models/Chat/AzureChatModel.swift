@@ -14,6 +14,7 @@ public class AzureChatModel: ObservableObject, ChatModel {
     
     var delegate: ChatModelDelegate?
     
+    private var displayName: String = ""
     private var identifier: String = ""
     private var token: String = ""
     
@@ -43,7 +44,8 @@ public class AzureChatModel: ObservableObject, ChatModel {
     
     @Published public var completedMessageFetch = false
     
-    public func initChatModel(endpoint: String, identifier: String, token: String) throws {
+    public func initChatModel(endpoint: String, identifier: String, token: String, displayName: String) throws {
+        self.displayName = displayName
         self.identifier = identifier
         self.token = token
         
@@ -91,8 +93,8 @@ public class AzureChatModel: ObservableObject, ChatModel {
         }
     }
     
-    public func startChat(identifier: String, displayName: String) {
-        self.initThread(identifier: identifier, displayName: displayName)
+    public func startChat(partnerIdentifier: String, partnerDisplayName: String) {
+        self.initThread(partnerIdentifier: partnerIdentifier, partnerDisplayName: partnerDisplayName)
     }
     
     // TODO: Manchmal falsche Reihenfolge
@@ -139,7 +141,7 @@ public class AzureChatModel: ObservableObject, ChatModel {
         
         let messageRequest = SendChatMessageRequest(
             content: message.message ?? "",
-            senderDisplayName: self.identifier,
+            senderDisplayName: self.displayName,
             type: .text,
             metadata: metadata
         )
@@ -187,19 +189,19 @@ public class AzureChatModel: ObservableObject, ChatModel {
         }
     }
     
-    private func initThread(identifier: String, displayName: String) {
+    private func initThread(partnerIdentifier: String, partnerDisplayName: String) {
         self.getActiveThread { chatThreadItem in
             if let chatThreadItem = chatThreadItem {
                 self.threadId = chatThreadItem.id
-                self.addParticipant(identifier: identifier, displayName: displayName)
+                self.addParticipant(partnerIdentifier: partnerIdentifier, partnerDisplayName: partnerDisplayName)
             } else {
                 
                 let request = CreateChatThreadRequest(
                     topic: "Quickstart",
                     participants: [
                         ChatParticipant(
-                            id: CommunicationUserIdentifier(CommunicationFrameworkHelper.id),
-                            displayName: CommunicationFrameworkHelper.displayName
+                            id: CommunicationUserIdentifier(self.identifier),
+                            displayName: self.displayName
                         )
                     ]
                 )
@@ -208,7 +210,7 @@ public class AzureChatModel: ObservableObject, ChatModel {
                     switch result {
                     case let .success(result):
                         self.threadId = result.chatThread?.id
-                        self.addParticipant(identifier: identifier, displayName: displayName)
+                        self.addParticipant(partnerIdentifier: partnerIdentifier, partnerDisplayName: partnerDisplayName)
                     case .failure:
                         fatalError("Failed to create thread.")
                     }
@@ -234,10 +236,9 @@ public class AzureChatModel: ObservableObject, ChatModel {
         }
     }
     
-    // TODO: Die Infos übe den identifier und den displayname müssen irgendwie bei der Implementierung in Erfahrung gebracht und übergeben werden
-    private func addParticipant(identifier: String, displayName: String) {
+    private func addParticipant(partnerIdentifier: String, partnerDisplayName: String) {
         self.getParticipants { participants in
-            let id = CommunicationUserIdentifier(identifier)
+            let id = CommunicationUserIdentifier(partnerIdentifier)
             if let participants = participants, participants.contains(where: { ($0.id as? CommunicationUserIdentifier)?.identifier ?? "" == id.identifier }) {
                 /// participant already exists
                 print("Participant already exists.")
@@ -245,7 +246,7 @@ public class AzureChatModel: ObservableObject, ChatModel {
                 /// Add participant
                 let user = ChatParticipant(
                     id: id,
-                    displayName: displayName
+                    displayName: partnerDisplayName
                 )
 
                 self.chatThreadClient?.add(participants: [user]) { result, _ in

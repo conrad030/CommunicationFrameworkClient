@@ -14,7 +14,7 @@ struct MessageView: View {
     
     @ObservedObject var chatMessage: ChatMessage
     private var isOwnMessage: Bool {
-        self.chatMessage.senderIdentifier == CommunicationFrameworkHelper.id
+        self.chatMessage.senderIdentifier == self.chatViewModel.identifier
     }
     private let cornerRadius: CGFloat = 15
     @State private var showFileExporter = false

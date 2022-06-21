@@ -28,14 +28,13 @@ class ChatViewModel: NSObject, ObservableObject {
         }
     }
     @Published public var chatIsSetup = false
-    @Published public var chatPartnerName: String?
+    @Published private(set) var identifier: String?
+    @Published private(set) var displayName: String?
+    @Published private(set) var chatPartnerName: String?
     public var loadedMessages: Bool {
         return self.chatModel.completedMessageFetch
     }
-    // TODO: Nicht hier und nicht so
-    public var enableChatButton: Bool {
-        !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty
-    }
+    @Published private(set) var initFinished = false
     
     init<Model: ChatModel & ObservableObject>(chatModel: Model, container: NSPersistentContainer = NSPersistentContainer(name: "ChatStore")) {
         self.chatModel = chatModel
@@ -67,11 +66,13 @@ class ChatViewModel: NSObject, ObservableObject {
         }
     }
     
-    public func initChatViewModel() {
-        // TODO: Werte können auch übergeben werden, statt statisch gesetzt zu werden
-        if !CommunicationFrameworkHelper.endpoint.isEmpty && !CommunicationFrameworkHelper.token.isEmpty {
+    public func initChatViewModel(identifier: String, displayName: String, endpoint: String, token: String) {
+        self.identifier = identifier
+        self.displayName = displayName
+        if !endpoint.isEmpty && !identifier.isEmpty && !token.isEmpty {
             do {
-                try self.chatModel.initChatModel(endpoint: CommunicationFrameworkHelper.endpoint, identifier: CommunicationFrameworkHelper.id, token: CommunicationFrameworkHelper.token)
+                try self.chatModel.initChatModel(endpoint: endpoint, identifier: identifier, token: token, displayName: displayName)
+                self.initFinished = true
             } catch {
                 print("ChatClient couldn't be initialized. Error: \(error.localizedDescription)")
             }
@@ -85,12 +86,12 @@ class ChatViewModel: NSObject, ObservableObject {
         self.chatModel.startRealTimeNotifications()
     }
     
-    public func startChat(with identifier: String, displayName: String) {
-        if CommunicationFrameworkHelper.id.isEmpty || CommunicationFrameworkHelper.displayName.isEmpty {
+    public func startChat(with identifier: String, partnerDisplayName: String) {
+        if self.identifier?.isEmpty ?? true || self.displayName?.isEmpty ?? true {
             print("Identifier and/or displayname are missing. Couldn't initialize chat model.")
         } else {
             self.chatPartnerName = displayName
-            self.chatModel.startChat(identifier: identifier, displayName: displayName)
+            self.chatModel.startChat(partnerIdentifier: identifier, partnerDisplayName: partnerDisplayName)
         }
     }
     
@@ -129,39 +130,43 @@ class ChatViewModel: NSObject, ObservableObject {
     /// Send a message in a thread
     public func sendMessage(text: String, fileRepresentable: FileRepresentable?) {
         
-        if text.isEmpty && fileRepresentable == nil { return }
-        
-        let chatMessage = ChatMessage(context: self.context)
-        chatMessage.id = UUID()
-        chatMessage.senderIdentifier = CommunicationFrameworkHelper.id
-        chatMessage.message = !text.isEmpty ? text : nil
-        chatMessage.createdOn = Date()
-        if let fileRepresentable = fileRepresentable {
-            let file = File(context: self.context)
-            file.id = UUID()
-            file.name = fileRepresentable.name
-            file.type = fileRepresentable.fileType
-            file.data = fileRepresentable.data
-            chatMessage.file = file
-        }
-        withAnimation {
-            self.save(message: chatMessage)
-        }
-        
-        if let fileRepresentable = fileRepresentable {
-            self.uploadFile(id: chatMessage.file!.id, fileRepresentable: fileRepresentable) { success in
-                if success {
-                    self.chatModel.sendMessage(message: chatMessage) { messageId in
-                        self.setChatMessageId(for: chatMessage, id: messageId)
+        if let identifier = self.identifier {
+            if text.isEmpty && fileRepresentable == nil { return }
+            
+            let chatMessage = ChatMessage(context: self.context)
+            chatMessage.id = UUID()
+            chatMessage.senderIdentifier = identifier
+            chatMessage.message = !text.isEmpty ? text : nil
+            chatMessage.createdOn = Date()
+            if let fileRepresentable = fileRepresentable {
+                let file = File(context: self.context)
+                file.id = UUID()
+                file.name = fileRepresentable.name
+                file.type = fileRepresentable.fileType
+                file.data = fileRepresentable.data
+                chatMessage.file = file
+            }
+            withAnimation {
+                self.save(message: chatMessage)
+            }
+            
+            if let fileRepresentable = fileRepresentable {
+                self.uploadFile(id: chatMessage.file!.id, fileRepresentable: fileRepresentable) { success in
+                    if success {
+                        self.chatModel.sendMessage(message: chatMessage) { messageId in
+                            self.setChatMessageId(for: chatMessage, id: messageId)
+                        }
+                    } else {
+                        print("File couldn't be uploaded.")
                     }
-                } else {
-                    print("File couldn't be uploaded.")
+                }
+            } else {
+                self.chatModel.sendMessage(message: chatMessage) { messageId in
+                    self.setChatMessageId(for: chatMessage, id: messageId)
                 }
             }
         } else {
-            self.chatModel.sendMessage(message: chatMessage) { messageId in
-                self.setChatMessageId(for: chatMessage, id: messageId)
-            }
+            print("Identifier in ChatViewModel is unset.")
         }
     }
     
@@ -225,7 +230,7 @@ extension ChatViewModel: ChatModelDelegate {
     
     public func handleChatMessageReceived(event: ReceivedChatMessageResponse) {
         /// Only add message if sender is the chat partner
-        if let senderIdentifier = event.senderIdentifier, senderIdentifier != CommunicationFrameworkHelper.id {
+        if let senderIdentifier = event.senderIdentifier, senderIdentifier != self.identifier {
             if let id = event.messageId, !self.chatMessages.contains(where: { $0.id.uuidString == id }) {
                 withAnimation {
                     let chatMessage = ChatMessage(context: self.context)
@@ -254,7 +259,7 @@ extension ChatViewModel: ChatModelDelegate {
     }
     
     public func handleReadReceipt(event: ReadReceiptResponse) {
-        let ownMessages = self.chatMessages.filter { message in message.senderIdentifier == CommunicationFrameworkHelper.id }
+        let ownMessages = self.chatMessages.filter { message in message.senderIdentifier == self.identifier }
         for (index, message) in ownMessages.reversed().enumerated() {
             
             if message.chatMessageId == event.messageId {
@@ -309,14 +314,14 @@ extension ChatViewModel: ChatModelDelegate {
     
     // TODO: Nicht schön. Diese Methode wird direkt nach handleGetThreadMessages in AzureChatModel aufgerufen... Lässt sich bestimmt irgendwie zusamenfassen.
     public func sendReadReceipts() {
-        if let message = self.chatMessages.filter({ $0.senderIdentifier != CommunicationFrameworkHelper.id && $0.status != .read }).last, let messageId = message.chatMessageId {
+        if let message = self.chatMessages.filter({ $0.senderIdentifier != self.identifier && $0.status != .read }).last, let messageId = message.chatMessageId {
             self.chatModel.sendReadReceipt(for: messageId)
         }
     }
     
     public func handleChatMessageStati(items: [ReadReceiptResponse]) {
         var messageFound = false
-        for message in self.chatMessages.reversed().filter({ message in message.senderIdentifier == CommunicationFrameworkHelper.id }) {
+        for message in self.chatMessages.reversed().filter({ message in message.senderIdentifier == self.identifier }) {
             // Wenn eine Nachricht gefunden wurde, die bereits gelesen wurde, ist klar, dass alle Nachfolger auch schon gelesen sein müssen und die Schleife kann abgebrochen werden
             if message.status == .read { break }
             // Wenn messageFound noch false ist, dann muss geprüft werden, ab welcher eigenen Nachricht es eine Lesebestätigung gibt. Wenn eine gefunden wurde, wird messageFound auf true gesetzt, damit diese Prüfung für alle Nachfolger nicht mehr nötig ist.

@@ -11,9 +11,9 @@ protocol ChatModel {
     var delegate: ChatModelDelegate? { get set }
     var threadId: String? { get }
     var completedMessageFetch: Bool { get }
-    func initChatModel(endpoint: String, identifier: String, token: String) throws
+    func initChatModel(endpoint: String, identifier: String, token: String, displayName: String) throws
     func startRealTimeNotifications()
-    func startChat(identifier: String, displayName: String)
+    func startChat(partnerIdentifier: String, partnerDisplayName: String)
     func getThreadMessages()
     func sendReadReceipt(for messageId: String)
     func sendMessage(message: ChatMessage, completion: @escaping (String) -> Void)
