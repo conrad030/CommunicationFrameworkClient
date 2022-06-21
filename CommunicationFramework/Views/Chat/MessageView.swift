@@ -16,6 +16,10 @@ struct MessageView: View {
     private var isOwnMessage: Bool {
         self.chatMessage.senderIdentifier == self.chatViewModel.identifier
     }
+    private var isLastOwnReadMessage: Bool {
+        let ownReadMessages = self.chatViewModel.chatMessages.filter { $0.senderIdentifier == self.chatViewModel.identifier && $0.status == .read && !$0.isInvalidated }
+        return ownReadMessages.last?.id == self.chatMessage.id
+    }
     private let cornerRadius: CGFloat = 15
     @State private var showFileExporter = false
     @State private var showSaveSuccessAlert = false
@@ -181,7 +185,7 @@ struct MessageView: View {
                         }
                     }
                     
-                    if self.isOwnMessage && self.chatMessage.status == .read && !self.chatMessage.isInvalidated {
+                    if self.isLastOwnReadMessage {
                         
                         self.readView
                     }
