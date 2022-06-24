@@ -19,14 +19,14 @@ class MockChatModel: ObservableObject, ChatModel {
     
     var completedMessageFetch: Bool = false
     
-    @Published private(set) var initChatModelCalled = false
-    @Published private(set) var startRealTimeNotificationsCalled = false
-    @Published private(set) var startChatCalled = false
-    @Published private(set) var getThreadMessagesCalled = false
-    @Published private(set) var sendReadReceiptCalled = false
-    @Published private(set) var sendMessageCalled = false
-    @Published private(set) var deleteMessageCalled = false
-    @Published private(set) var invalidateCalled = false
+    private(set) var initChatModelCalled = false
+    private(set) var startRealTimeNotificationsCalled = false
+    private(set) var startChatCalled = false
+    private(set) var getThreadMessagesCalled = false
+    private(set) var sendReadReceiptCalled = false
+    private(set) var sendMessageCalled = false
+    private(set) var deleteMessageCalled = false
+    private(set) var invalidateCalled = false
     
     func initChatModel(endpoint: String, identifier: String, token: String, displayName: String) throws {
         self.initChatModelCalled = true

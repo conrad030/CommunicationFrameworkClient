@@ -1063,6 +1063,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 78RSNDD442;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Test target needs access to camera";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Test target needs access to camera";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = conradfelgentreff.CommunicationFrameworkTests;
@@ -1084,6 +1086,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 78RSNDD442;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Test target needs access to camera";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Test target needs access to camera";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = conradfelgentreff.CommunicationFrameworkTests;

@@ -12,6 +12,7 @@ import CoreData
 class ChatViewModelTests: XCTestCase {
     
     var sut: ChatViewModel!
+    var mock: MockChatModel = MockChatModel()
     lazy var testContext: NSManagedObjectContext = {
         let container = NSPersistentContainer(name: "ChatStore")
         container.persistentStoreDescriptions[0].url = URL(fileURLWithPath: "/dev/null")
@@ -24,7 +25,7 @@ class ChatViewModelTests: XCTestCase {
     
     override func setUpWithError() throws {
         try super.setUpWithError()
-        self.sut = ChatViewModel(chatModel: MockChatModel(), context: self.testContext)
+        self.sut = ChatViewModel(chatModel: self.mock, context: self.testContext)
     }
     
     override func tearDownWithError() throws {
