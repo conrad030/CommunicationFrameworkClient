@@ -125,7 +125,7 @@ struct ContentView: View {
                         /// Init user token credentials
                         CommunicationFrameworkHelper.initUserTokenCredentials(displayName: displayName, token: token, id: identifier)
                         DispatchQueue.main.async {
-                            self.callingViewModel.initCallingViewModel()
+                            self.callingViewModel.initCallingViewModel(identifier: identifier, displayName: displayName, token: token)
                             self.chatViewModel.initChatViewModel(identifier: identifier, displayName: displayName, endpoint: endpoint, token: token)
                         }
                     } catch {

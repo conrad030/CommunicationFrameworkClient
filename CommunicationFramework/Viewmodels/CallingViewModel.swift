@@ -16,7 +16,6 @@ class CallingViewModel: ObservableObject {
     @Published private var callingModel: CallingModel
     private var anyCancellable: AnyCancellable? = nil
     
-    @Published public var displayName: String?
     public var localVideoStreamModel: VideoStreamModel? {
         self.callingModel.localVideoStreamModel
     }
@@ -29,6 +28,8 @@ class CallingViewModel: ObservableObject {
     
     @Published public var enableCallButton: Bool = false
     @Published public var presentCallView: Bool = false
+    
+    @Published public var displayName: String?
         
     init<Model: CallingModel & ObservableObject>(callingModel: Model) {
         self.callingModel = callingModel
@@ -50,10 +51,10 @@ class CallingViewModel: ObservableObject {
         }
     }
     
-    public func initCallingViewModel() {
-        if !CommunicationFrameworkHelper.id.isEmpty && !CommunicationFrameworkHelper.token.isEmpty && !CommunicationFrameworkHelper.displayName.isEmpty {
-            self.displayName = CommunicationFrameworkHelper.displayName
-            self.callingModel.initCallingModel(identifier: CommunicationFrameworkHelper.id, token: CommunicationFrameworkHelper.token, displayName: CommunicationFrameworkHelper.displayName)
+    public func initCallingViewModel(identifier: String, displayName: String, token: String) {
+        if !identifier.isEmpty && !displayName.isEmpty && !token.isEmpty {
+            self.displayName = displayName
+            self.callingModel.initCallingModel(identifier: identifier, token: token, displayName: displayName)
         } else {
             print("CallingModel couldn't be initialized. Credentials are missing.")
         }
