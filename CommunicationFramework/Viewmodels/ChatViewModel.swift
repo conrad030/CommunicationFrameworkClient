@@ -18,10 +18,7 @@ class ChatViewModel: NSObject, ObservableObject {
     
     private var fileStorageModel: FileStorage = AmplifyFileStorage()
     
-    private var container: NSPersistentContainer
-    private var context: NSManagedObjectContext {
-        self.container.viewContext
-    }
+    private var context: NSManagedObjectContext
     @Published public var chatMessages: [ChatMessage] = [] {
         didSet {
             self.setFileDataForMessages()
@@ -36,15 +33,20 @@ class ChatViewModel: NSObject, ObservableObject {
     }
     @Published private(set) var initFinished = false
     
-    init<Model: ChatModel & ObservableObject>(chatModel: Model, container: NSPersistentContainer = NSPersistentContainer(name: "ChatStore")) {
+    init<Model: ChatModel & ObservableObject>(chatModel: Model, context: NSManagedObjectContext? = nil) {
         self.chatModel = chatModel
-        self.container = container
-        super.init()
-        self.container.loadPersistentStores { description, error in
-            if let error = error {
-                print("Core Data failed to load: \(error.localizedDescription)")
+        if let context = context {
+            self.context = context
+        } else {
+            let container = NSPersistentContainer(name: "ChatStore")
+            container.loadPersistentStores { description, error in
+                if let error = error {
+                    print("Core Data failed to load: \(error.localizedDescription)")
+                }
             }
+            self.context = container.viewContext
         }
+        super.init()
         self.chatMessages = self.readData()
         self.chatModel.delegate = self
         /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected

@@ -13,10 +13,8 @@ import AVFoundation
 
 class CallingViewModel: ObservableObject {
     
-    /// The singleton instance of this class
-    public static let shared: CallingViewModel = CallingViewModel()
-    
     @Published private var callingModel: CallingModel
+    private var anyCancellable: AnyCancellable? = nil
     
     @Published public var displayName: String?
     public var localVideoStreamModel: VideoStreamModel? {
@@ -31,27 +29,16 @@ class CallingViewModel: ObservableObject {
     
     @Published public var enableCallButton: Bool = false
     @Published public var presentCallView: Bool = false
-    
-    private var anyCancellable: AnyCancellable? = nil
-    
-    struct Config {
-        var callingModel: CallingModel
-    }
-    
-    private static var config: Config?
-    
-    class func setup<Model: CallingModel & ObservableObject>(callingModel: Model) {
-        let config = Config(callingModel: callingModel)
-        CallingViewModel.config = config
-    }
         
-    private init() {
-        guard let config = CallingViewModel.config else {
-            fatalError("Error: You must call setup before accessing CallingViewModel.shared")
-        }
-        self.callingModel = config.callingModel
+    init<Model: CallingModel & ObservableObject>(callingModel: Model) {
+        self.callingModel = callingModel
         self.callingModel.delegate = self
+        /// Has to be linked to AnyCancellable, so changes of the ObservableObject are getting detected
+        self.anyCancellable = callingModel.objectWillChange.sink { [weak self] _ in
+            self?.objectWillChange.send()
+        }
         _ = PushRegistryDelegate.shared
+        self.initPushRegistry()
         self.initProvider()
         self.requestAudioAndVideoPermission { _ in }
     }
@@ -131,6 +118,15 @@ class CallingViewModel: ObservableObject {
     
     public func handlePushNotification(payload: PKPushPayload) {
         self.callingModel.handlePushNotification(payload: payload)
+    }
+    
+    private func initPushRegistry() {
+        PushRegistryDelegate.shared.setVoipToken = { token in
+            self.setVoipToken(token: token)
+        }
+        PushRegistryDelegate.shared.handlePushNotification = { payload in
+            self.handlePushNotification(payload: payload)
+        }
     }
     
     private func initProvider() {

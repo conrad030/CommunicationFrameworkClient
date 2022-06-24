@@ -28,7 +28,7 @@ class MockChatModel: ObservableObject, ChatModel {
     @Published private(set) var deleteMessageCalled = false
     @Published private(set) var invalidateCalled = false
     
-    func initChatModel(endpoint: String, identifier: String, token: String) throws {
+    func initChatModel(endpoint: String, identifier: String, token: String, displayName: String) throws {
         self.initChatModelCalled = true
     }
     
@@ -36,7 +36,7 @@ class MockChatModel: ObservableObject, ChatModel {
         self.startRealTimeNotificationsCalled = true
     }
     
-    func startChat(identifier: String, displayName: String) {
+    func startChat(partnerIdentifier identifier: String, partnerDisplayName displayName: String) {
         self.threadId = UUID().uuidString
     }
     

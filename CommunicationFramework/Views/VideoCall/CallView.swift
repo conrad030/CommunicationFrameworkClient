@@ -121,6 +121,6 @@ struct CallView: View {
 struct CallView_Previews: PreviewProvider {
     static var previews: some View {
         CallView()
-            .environmentObject(CallingViewModel.shared)
+            .environmentObject(CallingViewModel(callingModel: AzureCallingModel()))
     }
 }

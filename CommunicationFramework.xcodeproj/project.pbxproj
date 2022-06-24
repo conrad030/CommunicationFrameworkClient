@@ -36,6 +36,7 @@
 		7A4A458E28366C2C002B2CA6 /* ChatMessage+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4A458828366C2C002B2CA6 /* ChatMessage+CoreDataClass.swift */; };
 		7A4A458F28366C2C002B2CA6 /* File+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4A458928366C2C002B2CA6 /* File+CoreDataClass.swift */; };
 		7A4A459028366C2C002B2CA6 /* ChatMessage+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4A458A28366C2C002B2CA6 /* ChatMessage+CoreDataProperties.swift */; };
+		7A4AFA2A2865E27100EAC3EC /* MockCallingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A4AFA292865E27100EAC3EC /* MockCallingModel.swift */; };
 		7A62D2EB28228C16001D1C80 /* RoundedCorners.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A62D2EA28228C16001D1C80 /* RoundedCorners.swift */; };
 		7A62D2EE2822ABCC001D1C80 /* ImagePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A62D2ED2822ABCC001D1C80 /* ImagePicker.swift */; };
 		7A62D2F02822AF0E001D1C80 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A62D2EF2822AF0E001D1C80 /* HapticsManager.swift */; };
@@ -127,6 +128,7 @@
 		7A4A458828366C2C002B2CA6 /* ChatMessage+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ChatMessage+CoreDataClass.swift"; sourceTree = "<group>"; };
 		7A4A458928366C2C002B2CA6 /* File+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "File+CoreDataClass.swift"; sourceTree = "<group>"; };
 		7A4A458A28366C2C002B2CA6 /* ChatMessage+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "ChatMessage+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		7A4AFA292865E27100EAC3EC /* MockCallingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCallingModel.swift; sourceTree = "<group>"; };
 		7A62D2EA28228C16001D1C80 /* RoundedCorners.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedCorners.swift; sourceTree = "<group>"; };
 		7A62D2EC282291BC001D1C80 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 		7A62D2ED2822ABCC001D1C80 /* ImagePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePicker.swift; sourceTree = "<group>"; };
@@ -288,6 +290,14 @@
 			path = FileStorage;
 			sourceTree = "<group>";
 		};
+		7A4AFA282865E26000EAC3EC /* VideoCall */ = {
+			isa = PBXGroup;
+			children = (
+				7A4AFA292865E27100EAC3EC /* MockCallingModel.swift */,
+			);
+			path = VideoCall;
+			sourceTree = "<group>";
+		};
 		7A62D2E928228C07001D1C80 /* ViewHelpers */ = {
 			isa = PBXGroup;
 			children = (
@@ -369,6 +379,7 @@
 		7AE015BB2811AF68004A195B /* CommunicationFrameworkTests */ = {
 			isa = PBXGroup;
 			children = (
+				7A4AFA282865E26000EAC3EC /* VideoCall */,
 				7A87861B285381B100CCB700 /* Chat */,
 				7A87861928536A0A00CCB700 /* ChatViewModelTests.swift */,
 				7A8786172853699100CCB700 /* CallingViewModelTests.swift */,
@@ -819,6 +830,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A4AFA2A2865E27100EAC3EC /* MockCallingModel.swift in Sources */,
 				7AE015BD2811AF68004A195B /* CommunicationFrameworkTests.swift in Sources */,
 				7A87861D285382D000CCB700 /* MockChatModel.swift in Sources */,
 				7A87861A28536A0A00CCB700 /* ChatViewModelTests.swift in Sources */,

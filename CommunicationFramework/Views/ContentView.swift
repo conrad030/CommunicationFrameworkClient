@@ -142,7 +142,7 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         
         ContentView()
-            .environmentObject(CallingViewModel.shared)
+            .environmentObject(CallingViewModel(callingModel: AzureCallingModel()))
             .environmentObject(ChatViewModel(chatModel: AzureChatModel()))
     }
 }

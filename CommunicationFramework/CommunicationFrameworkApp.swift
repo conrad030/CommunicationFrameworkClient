@@ -12,15 +12,10 @@ import SwiftUI
 @main
 struct CommunicationFrameworkApp: App {
     
-    @StateObject private var callingViewModel: CallingViewModel = CallingViewModel.shared
+    @StateObject private var callingViewModel: CallingViewModel = CallingViewModel(callingModel: AzureCallingModel())
     @StateObject private var chatViewModel: ChatViewModel = ChatViewModel(chatModel: AzureChatModel())
     
     init() {
-        /// Set Model types for Viewmodels
-        let callingModel = AzureCallingModel()
-        CallingViewModel.setup(callingModel: callingModel)
-        CallingViewModel.shared.linkModelToViewModel(callingModel: callingModel)
-        
         /// Init notification hub credentials
         let hubName = getPlistInfo(resourceName: "Info", key: "HUBNAME")
         let hubUrl = getPlistInfo(resourceName: "Info", key: "HUBCONNECTIONURL")

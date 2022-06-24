@@ -12,6 +12,10 @@ import PushKit
 public class PushRegistryDelegate: NSObject {
     public static let shared: PushRegistryDelegate = PushRegistryDelegate()
     private let pushRegistry = PKPushRegistry(queue: DispatchQueue.main)
+    
+    var setVoipToken: ((Data) -> Void)?
+    
+    var handlePushNotification: ((PKPushPayload) -> Void)?
 
     private override init() {
         super.init()
@@ -25,7 +29,7 @@ extension PushRegistryDelegate: PKPushRegistryDelegate {
     
     /// Set the voip token when receiving it via push notification
     public func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
-        CallingViewModel.shared.setVoipToken(token: pushCredentials.token)
+        self.setVoipToken?(pushCredentials.token)
     }
 
     public func pushRegistry(_ registry: PKPushRegistry, didInvalidatePushTokenFor type: PKPushType) {
@@ -50,7 +54,7 @@ extension PushRegistryDelegate: PKPushRegistryDelegate {
                 }
                 completion()
                 
-                CallingViewModel.shared.handlePushNotification(payload: payload)
+                self.handlePushNotification?(payload)
             }
         }
     }

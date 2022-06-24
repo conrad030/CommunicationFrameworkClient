@@ -12,22 +12,19 @@ import CoreData
 class ChatViewModelTests: XCTestCase {
     
     var sut: ChatViewModel!
-    lazy var testContainer: NSPersistentContainer = {
+    lazy var testContext: NSManagedObjectContext = {
         let container = NSPersistentContainer(name: "ChatStore")
         container.persistentStoreDescriptions[0].url = URL(fileURLWithPath: "/dev/null")
         container.loadPersistentStores { description, error in
             XCTAssertNil(error)
         }
-        return container
+        return container.newBackgroundContext()
     }()
-    var context: NSManagedObjectContext {
-        self.testContainer.newBackgroundContext()
-    }
     var senderIdentifier = UUID().uuidString
     
     override func setUpWithError() throws {
         try super.setUpWithError()
-        self.sut = ChatViewModel(chatModel: MockChatModel(), container: self.testContainer)
+        self.sut = ChatViewModel(chatModel: MockChatModel(), context: self.testContext)
     }
     
     override func tearDownWithError() throws {
@@ -35,8 +32,12 @@ class ChatViewModelTests: XCTestCase {
         try super.tearDownWithError()
     }
     
+    private func initSutForChat() {
+        self.sut.initChatViewModel(identifier: UUID().uuidString, displayName: "Test User", endpoint: "https:://www.testendpoint.com", token: UUID().uuidString)
+    }
+    
     private func getNewChatMessage(withPdfFile: Bool = false) -> ChatMessage {
-        let message = ChatMessage(context: self.context)
+        let message = ChatMessage(context: self.testContext)
         message.id = UUID()
         message.senderIdentifier = self.senderIdentifier
         message.message = "test"
@@ -48,7 +49,7 @@ class ChatViewModelTests: XCTestCase {
     }
     
     private func getNewPdf() -> File {
-        let file = File(context: self.context)
+        let file = File(context: self.testContext)
         file.id = UUID()
         file.name = "testFile"
         file.type = .pdf
@@ -66,6 +67,7 @@ class ChatViewModelTests: XCTestCase {
     
     /// Can only be tested in local database
     func testSendMessage() {
+        self.initSutForChat()
         let text = "test"
         self.sut.sendMessage(text: text, fileRepresentable: nil)
         XCTAssertEqual(self.sut.chatMessages.count, 1, "Sent chat message is not included in Viewmodels chat messages")
@@ -74,6 +76,7 @@ class ChatViewModelTests: XCTestCase {
     }
     
     func testSendMessageWithImage() {
+        self.initSutForChat()
         let bundle = Bundle(for: ChatViewModelTests.self)
         let image = UIImage(named: "TestImage", in: bundle, with: .none)!
         let text = "imageTest"
@@ -87,6 +90,7 @@ class ChatViewModelTests: XCTestCase {
     }
     
     func testSendMessageWithPdf() {
+        self.initSutForChat()
         let bundle = Bundle(for: ChatViewModelTests.self)
         let pdfFile = PDFFile(data: NSDataAsset(name: "TestPdfData", bundle: bundle)!.data)
         let text = "pdfTest"
@@ -100,6 +104,7 @@ class ChatViewModelTests: XCTestCase {
     }
     
     func testDeleteMessageLocally() {
+        self.initSutForChat()
         let text = "test"
         self.sut.sendMessage(text: text, fileRepresentable: nil)
         self.sut.deleteMessageLocally(message: self.sut.chatMessages.first!)
@@ -107,6 +112,7 @@ class ChatViewModelTests: XCTestCase {
     }
     
     func testDeleteReadMessageRemote() {
+        self.initSutForChat()
         let message = self.getNewChatMessage()
         self.sut.deleteMessageForAll(message: message) { success in
             XCTAssertTrue(success, "Message couldn't be deleted")
@@ -114,6 +120,7 @@ class ChatViewModelTests: XCTestCase {
     }
     
     func testDeleteReadMessage() {
+        self.initSutForChat()
         let message = self.getNewChatMessage()
         message.status = .read
         self.sut.deleteMessageForAll(message: message) { success in

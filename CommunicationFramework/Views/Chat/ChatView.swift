@@ -166,7 +166,7 @@ struct ChatView: View {
                 self.sourceType = .camera
                 self.showImagePicker = true
             }
-            Button("Foto- oder Videomediathek") {
+            Button("Fotomediathek") {
                 self.sourceType = .photoLibrary
                 self.showImagePicker = true
             }
